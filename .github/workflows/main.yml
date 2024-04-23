@@ -19,15 +19,11 @@ jobs:
 
       - name: Install dependencies
         run:
-          sudo apt-get update && sudo apt-get install -y xvfb libfontconfig wkhtmltopdf
+          sudo apt-get install -y xvfb libfontconfig wkhtmltopdf
 
       - name: Install requirements.txt
         run:
-          sudo python -m pip install --upgrade pip && sudo python -m pip install -r requirements.txt
-
-      - name: Build
-        run:
-          python utils/add_build.py
+          sudo python -m pip install -r requirements.txt && sudo python utils/add_build.py
 
   deploy:
     runs-on: ubuntu-latest
