@@ -1,0 +1,22 @@
+name: Run commands on main branch push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run_commands:
+    container:
+      image: python:3.12
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install requirements
+        run: |
+          python -m pip install -r requirements.txt
+
+      - name: Run build commands
+        run: python utils/__init__.py
