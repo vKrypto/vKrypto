@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -19,6 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo su
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           apt-get update && apt-get install -y xvfb libfontconfig wkhtmltopdf
@@ -26,10 +27,17 @@ jobs:
       - name: Build
         run: |
           python3 utils/__init__.py
-          echo "Build your project here"
+        working-directory: ./
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          publish_dir: ./path/to/your/build/directory
