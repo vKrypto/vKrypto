@@ -1,5 +1,5 @@
-import imgkit
 import markdown2
+import imgkit
 import html2text
 from pathlib import Path
 from weasyprint import HTML, CSS
