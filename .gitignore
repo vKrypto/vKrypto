@@ -1,1 +1,40 @@
+venv
+# Compiled python files
+*.pyc
+
+# Virtual environment
+venv/
+env/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# IDE specific files
+.idea/
+.vscode/
+
+# Compiled files
+*.class
+*.war
+*.jar
+*.ear
+*.aar
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# macOS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.swp
+
+# Environment variables file
 .env
+
+# PDF output files
+*.pdf
