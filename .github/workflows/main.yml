@@ -23,11 +23,11 @@ jobs:
 
       - name: Install requirements.txt
         run:
-          sudo python -m pip install --upgrade pip && sudo python -m pip install -r requirements.txt
+          sudo python -m pip install --upgrade pip && sudo python -m pip install -r requirements.txt -t ./
 
       - name: Build
         run:
-          python utils/__init__.py
+          python utils/add_build.py
         working-directory: ./
 
   deploy:
