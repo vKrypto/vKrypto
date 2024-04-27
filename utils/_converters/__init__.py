@@ -29,7 +29,7 @@ class MediaConverter:
         self.build_folder = Path("build", working_dir)
         self.build_folder.mkdir(parents=True, exist_ok=True)  # make sure the build folder exists
         self.image_format = image_format or "webp"
-        self.style_css = style_css + "section {page-break-inside: avoid;} html{width: 100%;max-width: 700px;margin:auto} img{ width: 200px;}"
+        self.style_css = style_css
         if pdf_options is None:
             pdf_options = {}
         self.pdf_options = pdf_options
