@@ -2,12 +2,13 @@ import markdown2
 import imgkit
 import json
 import os
-from typing import List, Dict
+from typing import Dict
 import html2text
 import shutil
 from pathlib import Path
 from weasyprint import HTML, CSS
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from .formatter import HtmlFormatter
 
 
 cur_dir = os.path.dirname(os.path.realpath(__file__))
@@ -35,7 +36,19 @@ class MediaConverter:
         self.pdf_options = pdf_options
         self.pdf_options.update({"encoding": 'UTF-8', "font_family": 'Arial Unicode MS'})
         self.current_dir = os.path.dirname(os.path.realpath(__file__))
+        self.config = self.__read_config() or {}
+        self.check_assets()
+        self.tags = self.config.get('tags', [])
 
+    @property
+    def context(self):
+        return {
+            "css_str": self.style_css,
+            "html_str": self.html_str,
+            "tags": self.tags,
+            "config": self.config,
+        }
+        
     def _convert_html_to_png(self, html_content: str, output_file: str):
         imgkit.from_string(html_content, self._add_build_dir(output_file), options={'format': self.image_format})
 
@@ -63,22 +76,26 @@ class MediaConverter:
 
     def parse_html(self, html_: str) -> str:
         template = env.get_template('index.html')
-        return template.render(html_str=html_, css_str=self.style_css, tags=self.tags)
+        html_str = template.render(html_str=html_, css_str=self.style_css, tags=self.tags)
+        return HtmlFormatter.format_html_str(html_str)
 
     def check_assets(self):
         from_dir = self.working_dir.joinpath("assets")
         if os.path.exists(from_dir):
-            shutil.copytree(from_dir, os.path.join(self.build_folder, "assets"))
+            to_dir = os.path.join(self.build_folder, "assets")
+            shutil.copytree(
+                from_dir, to_dir, 
+                dirs_exist_ok=True
+            )
 
     def main(self):
         markdown_file = self.working_dir.joinpath("readme.md")
         with open(markdown_file, 'r') as f:
             markdown_text = f.read()
-        config_ = self.__read_config() or {}
-        self.check_assets()
-        self.tags = config_.get('tags', [])
+
         html_ = markdown2.markdown(markdown_text)
         html_ = self.parse_html(html_)
+        self.html_str = html_
 
         self.__write_content(markdown_text, "readme.md")
         self.__write_content(html_, "index.html")

@@ -13,6 +13,7 @@ def main():
         MediaConverter(working_dir=working_dir, **lesson_options).main()
         all_data[working_dir] = lesson_options
     json.dump(all_data, open(f"{cur_dir}/data.json", "w"), indent=4)
+    json.dump(all_data, open("build/data.json", "w"), indent=4)
 
 
 if __name__ == '__main__':
