@@ -45,26 +45,26 @@ class MediaConverter:
         return {
             "css_str": self.style_css,
             "html_str": self.html_str,
-            "tags": self.tags,
+            "tags": " ".join(self.tags),
             "config": self.config,
         }
         
-    def _convert_html_to_png(self, html_content: str, output_file: str):
-        imgkit.from_string(html_content, self._add_build_dir(output_file), options={'format': self.image_format})
+    def _convert_html_to_png(self, output_file: str):
+        imgkit.from_string(self.html_str, self._add_build_dir(output_file), options={'format': self.image_format})
 
-    def _convert_html_to_pdf(self, html_content: str, output_file: str):
-        HTML(string=html_content).write_pdf(
+    def _convert_html_to_pdf(self, output_file: str):
+        HTML(string=self.html_str).write_pdf(
             self._add_build_dir(output_file), stylesheets=[CSS(string=self.style_css)], **self.pdf_options
         )
 
-    def _convert_html_to_text(self, html_content: str, output_file: str):
-        content = html2text.html2text(html_content)
-        self.__write_content(content, output_file)
+    def _convert_html_to_text(self, output_file: str):
+        content = html2text.html2text(self.html_str)
+        self.__write_content(content.replace("**", ""), output_file)
 
     def _add_build_dir(self, output_file):
         return self.build_folder.joinpath(output_file)
 
-    def __write_content(self, content: str, output_file: str):
+    def __write_content(self, content:str, output_file: str):
         with open(self._add_build_dir(output_file), 'w') as f_p:
             f_p.write(content)
         
@@ -74,9 +74,9 @@ class MediaConverter:
             with open(file_, "r") as file:
                 return json.load(file)
 
-    def parse_html(self, html_: str) -> str:
+    def parse_html(self) -> str:
         template = env.get_template('index.html')
-        html_str = template.render(html_str=html_, css_str=self.style_css, tags=self.tags)
+        html_str = template.render(**self.context)
         return HtmlFormatter.format_html_str(html_str)
 
     def check_assets(self):
@@ -93,12 +93,11 @@ class MediaConverter:
         with open(markdown_file, 'r') as f:
             markdown_text = f.read()
 
-        html_ = markdown2.markdown(markdown_text)
-        html_ = self.parse_html(html_)
-        self.html_str = html_
+        self.html_str = markdown2.markdown(markdown_text)
+        self.html_str = self.parse_html()
 
         self.__write_content(markdown_text, "readme.md")
-        self.__write_content(html_, "index.html")
-        self._convert_html_to_text(html_, "index.log")
-        self._convert_html_to_png(html_, "index." + self.image_format.lower())
-        self._convert_html_to_pdf(html_, "index.pdf")
+        self.__write_content(self.html_str, "index.html")
+        self._convert_html_to_text("index.log")
+        self._convert_html_to_png("index." + self.image_format.lower())
+        self._convert_html_to_pdf("index.pdf")

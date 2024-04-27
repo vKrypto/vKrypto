@@ -9,6 +9,4 @@ Even giants like Flipkart and Amazon are struggling at 75-80, but we've set a ne
 
 Go and experience it yourself at [ORNAZ](https://www.ornaz.com/) desktop version.
 
-#NeedForSpeed #EcommerceRevolution #WebsitePerformance #SEOBoost #EcommerceOptimization #DigitalTransformation #TechInnovation #OnlineShopping #WebDevelopment #Flipkart #Amazon #TechnicalRecruitment #FasterShopping #EcommerceSuccess #WebPerformance #OnlineRetail #HighPerformance #UserExperience #FrontEndDevelopment #DeveloperLife
-
 <img src="https://media.licdn.com/dms/image/D5622AQEgyRhoKZlCLQ/feedshare-shrink_2048_1536/0/1714165311104?e=1717027200&v=beta&t=f7PbO1i7jrVI1cd_QWbk8Adme4BIaxSZjdv3h5NuTXk" />
