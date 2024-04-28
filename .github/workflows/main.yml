@@ -18,7 +18,7 @@ jobs:
 
       - name: Install core dependencies
         run:
-          apt-get install -y xvfb libfontconfig wkhtmltopdf
+          sudo apt-get install -y xvfb libfontconfig wkhtmltopdf
 
       - run:
           sudo python -m pip install -r requirements.txt
