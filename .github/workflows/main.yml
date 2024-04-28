@@ -3,31 +3,27 @@ name: Build and Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main2
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
         with:
           python-version: 3.8
+          architecture: 'x64'
+          cache: 'pip'
 
       - name: Install core dependencies
         run:
-          sudo apt-get update && sudoapt-get install -y xvfb libfontconfig wkhtmltopdf
+          apt-get install -y xvfb libfontconfig wkhtmltopdf
 
-      - name: Install requirements.txt
-        run:
-          sudo python -m pip install --upgrade pip && sudo python -m pip install -r requirements.txt
+      - run:
+          sudo python -m pip install -r requirements.txt
 
-      - name: Build
-        run:
-          python utils/add_build.py
+      - run: python utils/add_build.py
 
   deploy:
     runs-on: ubuntu-latest
