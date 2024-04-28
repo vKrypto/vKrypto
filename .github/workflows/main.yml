@@ -20,7 +20,7 @@ jobs:
         run:
           sudo apt-get install -y xvfb libfontconfig wkhtmltopdf
 
-      - run: python -m pip install -r requirements.txt && python utils/add_build.py
+      - run: sudo python -m pip install -r requirements.txt && sudo python utils/add_build.py
 
   deploy:
     runs-on: ubuntu-latest
