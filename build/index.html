@@ -12,5 +12,24 @@ Copy code
         <li><a href="/posts/ornaz/post_1">posts/ornaz/post_1</a></li>
         <li><a href="/lessons/0_planning/post_1">lessons/0_planning/post_1</a></li>
     </ul>
+
+    <ul id="links"></ul>
+
+    <script>
+        fetch('./data.json')
+            .then(response => response.json())
+            .then(data => {
+                const links = document.getElementById('links');
+                Object.keys(data).forEach(key => {
+                    const listItem = document.createElement('li');
+                    const link = document.createElement('a');
+                    link.href = `${key}.html`;
+                    link.textContent = key;
+                    listItem.appendChild(link);
+                    links.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
 </body>
 </html>
