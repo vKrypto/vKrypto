@@ -35,7 +35,7 @@ __pycache__/
 
 # PDF output files
 *.pdf
-build/lessons/
-build/posts/
-build/blogs/
-build/projects/
+# build/lessons/
+# build/posts/
+# build/blogs/
+# build/projects/
