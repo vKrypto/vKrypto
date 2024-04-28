@@ -46,7 +46,7 @@ class MediaConverter:
     @property
     def context(self):
         return {
-            "css_str": self.style_css,
+            "css_str": f"<style>{self.style_css}</style>" if self.style_css else "",
             "html_str": self.html_str,
             "tags": " ".join(self.tags),
             "config": self.config,
