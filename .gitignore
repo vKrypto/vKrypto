@@ -2,15 +2,12 @@ venv
 # Compiled python files
 *.pyc
 logs*
-# Virtual environment
 venv/
 env/
 
-# Logs and databases
 *.log
 *.sqlite3
 
-# IDE specific files
 .idea/
 .vscode/
 
