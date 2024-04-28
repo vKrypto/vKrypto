@@ -39,3 +39,4 @@ __pycache__/
 # build/posts/
 # build/blogs/
 # build/projects/
+build/Gemfile.lock
