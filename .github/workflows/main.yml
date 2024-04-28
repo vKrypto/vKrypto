@@ -23,7 +23,7 @@ jobs:
       - name: Change ownership of /run/user/1001
         run: sudo chown -R 1001:1001 /run/user/1001
       
-      - run: sudo python -m pip install -r requirements.txt && sudo python utils/add_build.py
+      - run: sudo chown -R 1001:1001 /run/user/1001 && sudo python -m pip install -r requirements.txt && sudo python utils/add_build.py
 
   deploy:
     runs-on: ubuntu-latest
