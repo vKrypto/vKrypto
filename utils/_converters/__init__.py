@@ -90,6 +90,7 @@ class MediaConverter:
                 "./assets/images/" +  x 
                 # "file://" + str(os.path.join(src_dir, self.build_folder.joinpath("assets/images/" + x))) 
                 for x in os.listdir(_dir)]
+            self.images = []
 
     def check_assets(self):
         from_dir = self.working_dir.joinpath("assets")
