@@ -12,6 +12,7 @@ from .formatter import HtmlFormatter
 
 
 cur_dir = os.path.dirname(os.path.realpath(__file__))
+src_dir = os.path.dirname(os.path.realpath(__name__))
 env = Environment(
     loader=FileSystemLoader([
         cur_dir,
@@ -24,7 +25,8 @@ env = Environment(
 class MediaConverter:
     def __init__(
             self, working_dir: str,
-            style_css: str = "", pdf_options: dict = None, image_format: str = None
+            style_css: str = "", pdf_options: dict = None, image_format: str = None,
+            **kwargs
     ):
         self.working_dir = Path("src", working_dir)
         self.build_folder = Path("build", working_dir)
@@ -37,6 +39,7 @@ class MediaConverter:
         self.pdf_options.update({"encoding": 'UTF-8', "font_family": 'Arial Unicode MS'})
         self.current_dir = os.path.dirname(os.path.realpath(__file__))
         self.config = self.__read_config() or {}
+        self.images = []
         self.check_assets()
         self.tags = self.config.get('tags', [])
 
@@ -47,6 +50,7 @@ class MediaConverter:
             "html_str": self.html_str,
             "tags": " ".join(self.tags),
             "config": self.config,
+            "images": self.images or []
         }
         
     def _convert_html_to_png(self, output_file: str):
@@ -79,9 +83,18 @@ class MediaConverter:
         html_str = template.render(**self.context)
         return HtmlFormatter.format_html_str(html_str)
 
+    def _check_image_assets(self):
+        _dir = self.working_dir.joinpath("assets", "images")
+        if os.path.exists(_dir):
+            self.images = [
+                "./assets/images/" +  x 
+                # "file://" + str(os.path.join(src_dir, self.build_folder.joinpath("assets/images/" + x))) 
+                for x in os.listdir(_dir)]
+
     def check_assets(self):
         from_dir = self.working_dir.joinpath("assets")
         if os.path.exists(from_dir):
+            self._check_image_assets()
             to_dir = os.path.join(self.build_folder, "assets")
             shutil.copytree(
                 from_dir, to_dir, 

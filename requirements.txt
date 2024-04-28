@@ -2,5 +2,5 @@ markdown2
 weasyprint
 html2text
 imgkit
-shutil
 jinja2
+bs4

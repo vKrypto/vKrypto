@@ -9,11 +9,14 @@
     section {page-break-inside: avoid;}
     html{width: 100%;max-width: 800px;margin:auto}
     img{ max-width: 400px}
-    {{css_str|safe}}
   </style>
+  <style>{{css_str|safe}}</style>
   <body>
     {{html_str|safe}} 
-    <hr/>
     {{tags}}
+    <hr/>
+    {% for image in images %}
+        <img src="{{image}}" alt=""/>
+    {% endfor %}
   </body>
 </html>

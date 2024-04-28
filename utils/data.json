@@ -1,5 +1,9 @@
 {
     "lessons/a_dsa/a_network_layers": {},
-    "posts/ornaz/post_1": {},
-    "lessons/0_planning/post_1": {}
+    "posts/ornaz/post_1": {
+        "date": "2024-04-27"
+    },
+    "lessons/0_planning/post_1": {
+        "date": "2024-04-25"
+    }
 }
