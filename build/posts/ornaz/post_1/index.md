@@ -16,4 +16,4 @@ Go and experience it yourself at [ORNAZ](https://www.ornaz.com/) desktop version
 
 <img src="https://media.licdn.com/dms/image/D5622AQEgyRhoKZlCLQ/feedshare-shrink_2048_1536/0/1714165311104?e=1717027200&v=beta&t=f7PbO1i7jrVI1cd_QWbk8Adme4BIaxSZjdv3h5NuTXk" />
 
-![Amazon]("./assets/images/amazon.png")
+![Amazon](./assets/images/amazon.png)
