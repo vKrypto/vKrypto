@@ -9,8 +9,8 @@ Copy code
 </head>
 <body>
     <ul>
-        <li><a href="/posts/ornaz/post_1">posts/ornaz/post_1</a></li>
-        <li><a href="/lessons/0_planning/post_1">lessons/0_planning/post_1</a></li>
+        <li><a href="./posts/ornaz/post_1">posts/ornaz/post_1</a></li>
+        <li><a href="./lessons/0_planning/post_1">lessons/0_planning/post_1</a></li>
     </ul>
 
     <ul id="links"></ul>
@@ -23,7 +23,7 @@ Copy code
                 Object.keys(data).forEach(key => {
                     const listItem = document.createElement('li');
                     const link = document.createElement('a');
-                    link.href = `${key}.html`;
+                    link.href = `${key}`;
                     link.textContent = key;
                     listItem.appendChild(link);
                     links.appendChild(listItem);
