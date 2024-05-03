@@ -1,0 +1,23 @@
+<!-- https://www.hootsuite.com/social-media-tools/linkedin-post-generator -->
+
+fetch("https://www.hootsuite.com/api/contentGenerator", {
+    "headers": {
+      "accept": "*/*",
+      "accept-language": "en-US,en;q=0.9",
+      "cache-control": "no-cache",
+      "content-type": "application/json",
+      "pragma": "no-cache",
+      "priority": "u=1, i",
+      "sec-ch-ua": "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": "\"Linux\"",
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      "cookie": "mutiny.user.token=18ccdd4a-97fd-46b0-9327-46f05c471bc2; mutiny.user.token=18ccdd4a-97fd-46b0-9327-46f05c471bc2; language=en-us; utm_medium=organic; utm_source=google; utm_campaign=; utm_content=; utm_term=; Last_Associated_Campaign__c_session=701a0000002UmHe; GTMUtmTimestamp=1713795358445; GTMUtmSource=google.com; GTMUtmMedium=referral; _gcl_au=1.1.38788581.1713795358; _gd_visitor=c928e9cc-fce1-4ded-8515-b8c82726448f; _gd_svisitor=5cd70b17821800006e7d6763e0030000e4251700; FPID=FPID2.2.Lr4hbiH%2FazKe1sW3ZoTfeYWPu6BmERz2v35XI5L8aAQ%3D.1713795359; _mibhv=anon-1713795359468-4007655086_9065; _mkto_trk=id:407-OYZ-482&token:_mch-hootsuite.com-1713795360349-99513; _pin_unauth=dWlkPVpUVmtZelkwT0RJdFpUZzBNeTAwTmpFd0xUazBZVFl0WVRFMU1qQmlPVE01WlRWaw; _tt_enable_cookie=1; _ttp=pmWtEN33Xmx9oMc3FfZVLsQLDa0; __qca=P0-937729128-1713795359415; cjConsent=MHxOfDB8Tnww; cjUser=d653f140-51a4-4f55-80c2-03d7451bb155; drift_aid=ca0c6ef5-22f2-4ef8-96e1-49bea90aa74a; driftt_aid=ca0c6ef5-22f2-4ef8-96e1-49bea90aa74a; GTMLandingPage=https%3A%2F%2Fwww.hootsuite.com%2Fsocial-media-tools%2Flinkedin-post-generator; _fbp=fb.1.1714289798407.42853758; mutiny.user.session=593c9973-eb3c-47e5-a2a1-186815f57f70; mutiny.user.session=593c9973-eb3c-47e5-a2a1-186815f57f70; _fs_sample_user=true; mutiny.user.session_number=3; mutiny.user.session_number=3; GTMPreviousSessionID=1714289795%2C1713795359; fs_lua=1.1714663340325; fs_uid=#o-1A0H2C-na1#ca842cb0-41c8-47da-aa60-dba3fc5ae452:d39499b3-49dd-4e8f-955a-035737954371:1714663340325::1#/1745331364; _gd_session=7ee4bab6-9d76-40db-83dc-b4d5d8bcddad; _derived_epik=dj0yJnU9Umg2WWh3YWg1UENEODRnWXZtYUN6SzRtMUdndlFtVF8mbj1lUDdTbkhPeC1wUFoxekRpeWlYVjd3Jm09MSZ0PUFBQUFBR1l6cjZ3JnJtPTEmcnQ9QUFBQUFHWXpyNncmc3A9NQ; _rdt_uuid=1713795358991.be67d01d-910a-407e-8d1b-db8d3c3b4df3; FPLC=onMGNTV%2BcyB4gjwq8ZjX5GeHeWkx5ME2MezsNT6MYomwZdKUk5xz3bzzx75Uj4VTi4eFCe5dJrUklMX%2F9rDosJJkIUQgkl1kCbck7s2AtlV0RqUElWSKDL4e9rhKjw%3D%3D; cto_bundle=3zedP182azB2eUpUaWpWZUlFZ2NET2tkRUFpSk1RWmpxJTJGSWtjJTJCd0NZTlJod0NCbFBHbkR0dWh0bktJWW9jdlhTZG9Uc01maTBQdllBUSUyQkZTaVh1bUtuZkg0bElmSENZYnRzRW5Fb1pjNXRIYjRTa1JEM09tSll0QlVRRXh6JTJCaXI2SGpsYlVuQkQ0SXpnTXRsSHllSnFNWDZJZyUzRCUzRA; _ga=GA1.2.1363107563.1713795359; _gid=GA1.2.845331517.1714663346; AMP_TOKEN=%24NOT_FOUND; _uetsid=c81951b0089711efbd18250421cdb27b|1odxrcg|2|flf|0|1583; drift_campaign_refresh=f8fea082-1325-42cb-861e-759af24e95ee; _uetvid=d7563e1000b211ef8aad053d54e97c0c|917gl3|1714663348610|1|1|bat.bing.com/p/insights/c/z; FPGSID=1.1714663340.1714663482.G-9ZZYCN29EN._oNFzpk6IhESqFQZ7E7qBQ; OptanonAlertBoxClosed=2024-05-02T15:24:53.995Z; OptanonConsent=isGpcEnabled=0&datestamp=Thu+May+02+2024+20%3A54%3A54+GMT%2B0530+(India+Standard+Time)&version=202303.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=357a8afe-f6a5-4229-ba9a-8daa48e8fb28&interactionCount=1&landingPath=NotLandingPage&groups=C0003%3A1%2CC0004%3A1%2CC0002%3A1%2CC0005%3A1%2CC0001%3A1; _ga_9ZZYCN29EN=GS1.1.1714663340.3.1.1714663535.0.0.2127250782",
+      "Referer": "https://www.hootsuite.com/social-media-tools/linkedin-post-generator",
+      "Referrer-Policy": "strict-origin-when-cross-origin"
+    },
+    "body": "{\"dropdown1\":\"Tech investor\",\"dropdown2\":\"English\",\"input1\":\"ai\",\"input2\":\"ai\",\"id\":\"6SYBabEGWpsmFoYdWwTTXe\",\"locale\":\"en-US\"}",
+    "method": "POST"
+  });

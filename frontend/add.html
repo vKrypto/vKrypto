@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add New Post</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    
+    
+    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+  </head>
+  <body>
+    <style>
+      body {
+        background: #fafbfb;
+      }
+      .post-form > div {
+        margin: 10px 0;
+      }
+
+      .tag-container {
+        display: flex;
+        flex-flow: row wrap;
+      }
+
+      .tag {
+        pointer-events: none;
+        background-color: #242424;
+        color: white;
+        padding: 6px;
+        margin: 5px;
+      }
+
+      .tag::before {
+        pointer-events: all;
+        display: inline-block;
+        content: "x";
+        height: 20px;
+        width: 20px;
+        margin-right: 6px;
+        text-align: center;
+        color: #ccc;
+        background-color: #111;
+        cursor: pointer;
+      }
+    </style>
+
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-12">
+          <h1 class="mb-3">Contact Us</h1>
+          <form>
+            <div class="row g-3 post-form">
+              <div class="col-md-12">
+                <label for="title" class="form-label">Title</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="title"
+                  name="title"
+                  required
+                />
+              </div>
+              <div class="col-md-12">
+                <label for="description" class="form-label"
+                  >Short Description</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="description"
+                  name="short_description"
+                  required
+                />
+              </div>
+              <div class="col-12">
+                <label for="markdown" class="form-label"
+                  >Post (start writing)</label
+                >
+                <textarea
+                  class="form-control"
+                  id="markdown"
+                  name="post_markdown"
+                  rows="5"
+                  required
+                ></textarea>
+              </div>
+              <div class="col-md-12">
+                <label for="keywords" class="form-label">Seo keywords</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="keywords"
+                  name="keywords"
+                  required
+                />
+              </div>
+              <input
+                  type="text" style="display: none;"
+                  id="hashtags"
+                  name="hashtags"
+                />
+                <div class="col-md-12">
+                    <label for="platforms" class="form-label">Platforms</label>
+                    <div class="row" style="margin-right:15px;margin-left:15px;">
+                    <div class="form-check form-switch col-md-3">
+                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault"  name="platforms" >
+                            <label class="form-check-label" for="flexSwitchCheckDefault">LinkedIn</label>
+                        </div>
+                        <div class="form-check form-switch col-md-3">
+                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" name="platforms"  checked>
+                            <label class="form-check-label" for="flexSwitchCheckChecked">Github Pages</label>
+                        </div>
+                        <div class="form-check form-switch col-md-3">
+                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" name="platforms"  checked>
+                            <label class="form-check-label" for="flexSwitchCheckChecked">Github Markdown</label>
+                        </div>
+                        <div class="form-check form-switch col-md-3">
+                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" name="platforms"  checked>
+                            <label class="form-check-label" for="flexSwitchCheckChecked">Google +</label>
+                        </div>
+                        <div class="form-check form-switch col-md-3">
+                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDisabled" name="platforms" disabled>
+                            <label class="form-check-label" for="flexSwitchCheckDisabled">Instagram</label>
+                        </div>
+                        <div class="form-check form-switch col-md-3">
+                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDisabled" name="platforms" disabled>
+                            <label class="form-check-label" for="flexSwitchCheckDisabled">Instagram</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+              <div class="row">
+                <div class="col-md-6">
+                  <button
+                    data-res="<?php echo $sum; ?>"
+                    type="submit"
+                    class="btn btn-dark w-100 fw-bold"
+                  >
+                    Submit Request
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="col-md-6">
+            <label for="hashtags-placeholder" class="form-label">Hash-Tags</label>
+            <input
+              type="text"
+              class="form-control"
+              id="hashtags-placeholder"
+              name="hashtags"
+              autocomplete="off"
+            />
+            <div class="tag-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <!-- markdown viewer -->
+  <script>
+    const editor = new EasyMDE({
+        autofocus: true,
+        autosave: {
+            enabled: true,
+            uniqueId: "add-post",
+            delay: 1000,
+            submit_delay: 5000,
+            timeFormat: {
+                locale: 'en-US',
+                format: {
+                    year: 'numeric',
+                    month: 'long',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                },
+            },
+            text: "Autosaved: "
+        },
+        element: document.getElementById("markdown"),
+        forceSync: true,
+        hideIcons: ["guide", "heading"],
+        indentWithTabs: true,
+        initialValue: "Hello world!",
+        insertTexts: {
+            horizontalRule: ["", "\n\n-----\n\n"],
+            image: ["![](http://", ")"],
+            link: ["[", "](https://)"],
+            table: ["", "\n\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text      | Text     |\n\n"],
+        },
+        lineWrapping: true,
+        minHeight: "500px",
+        parsingConfig: {
+            allowAtxHeaderWithoutSpace: true,
+            strikethrough: false,
+            underscoresBreakWords: true,
+        },
+        placeholder: "Type here...",
+        showIcons: ["code", "table"],
+        spellChecker: true,
+        status: false,
+        status: ["autosave", "lines", "words", "cursor"], // Optional usage
+        status: ["autosave", "lines", "words", "cursor", {
+            className: "keystrokes",
+            defaultValue: (el) => {
+                el.setAttribute('data-keystrokes', 0);
+            },
+            onUpdate: (el) => {
+                const keystrokes = Number(el.getAttribute('data-keystrokes')) + 1;
+                el.innerHTML = `${keystrokes} Keystrokes`;
+                el.setAttribute('data-keystrokes', keystrokes);
+            },
+        }], // Another optional usage, with a custom status bar item that counts keystrokes
+        styleSelectedText: false,
+        sideBySideFullscreen: false,
+        syncSideBySidePreviewScroll: true,
+        tabSize: 4,
+        toolbarTips: true,
+        toolbarButtonClassPrefix: "mde",
+    });
+  </script>
+
+  <!-- for hashtags -->
+  <script>
+    const refreshHashtags = () => {
+        tagElements = document.querySelectorAll(".tag");
+        tagTextList = Array.from(tagElements).map(node => node.textContent);
+        actual_input = document.querySelector('#hashtags');
+        actual_input.value = tagTextList.join(", ");
+    }
+    let input, hashtagArray, container, t;
+    input = document.querySelector('#hashtags-placeholder');
+    container = document.querySelector('.tag-container');
+    hashtagArray = [];
+
+    input.addEventListener('keyup', () => {
+        if (event.which == 13 && input.value.length > 0) {
+        var text = document.createTextNode(input.value);
+        var p = document.createElement('p');
+        container.appendChild(p);
+        p.appendChild(text);
+        p.classList.add('tag');
+        input.value = '';
+        
+        let deleteTags = document.querySelectorAll('.tag');
+        refreshHashtags();
+        for(let i = 0; i < deleteTags.length; i++) {
+            deleteTags[i].addEventListener('click', () => {
+            container.removeChild(deleteTags[i]);
+            refreshHashtags();
+            });
+        }
+        }
+    });
+  </script>
+</html>
