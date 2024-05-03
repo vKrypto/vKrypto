@@ -4,3 +4,6 @@ html2text
 imgkit
 jinja2
 bs4
+fastapi
+unvicorn
+pyjwt

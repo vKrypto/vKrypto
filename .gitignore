@@ -40,3 +40,5 @@ __pycache__/
 # build/blogs/
 # build/projects/
 build/Gemfile.lock
+
+*/.jekyll-cache
