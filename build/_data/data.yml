@@ -4,7 +4,7 @@
 
 sidebar:
     position: left # position of the sidebar : left or right
-    about: True # set to False or comment line if you want to remove the "how to use?" in the sidebar
+    about: False # set to False or comment line if you want to remove the "how to use?" in the sidebar
     education: True # set to False if you want education in main section instead of in sidebar
 
     # Profile information
@@ -15,60 +15,59 @@ sidebar:
     # Sidebar links
     email: ashutosh.career19@gmail.com
     phone: +91-7335437836
-    timezone: America/Cancun Timezone
+    timezone: India Standard Time (IST)
     citizenship:
-    website: blog.webjeda.com #do not add http://
-    linkedin: alandoe
-    xing: alandoe
-    github: sharu725
+    website: ashutoshverma.com #do not add http://
+    linkedin: ashutosh-verma-b90083106
+    xing: 
+    github: vKrypto
     telegram: # add your nickname without '@' sign
     gitlab:
     bitbucket:
-    twitter: '@webjeda'
+    twitter: '@ashu_just_ashu'
     stack-overflow: # Number/Username, e.g. 123456/alandoe
     codewars:
     goodreads: # Number-Username, e.g. 123456-alandoe
-    pdf: http://www.africau.edu/images/default/sample.pdf
+    pdf: #
 
     languages:
       title: Languages
       info:
         - idiom: English
+          level: Professional
+
+        - idiom: Hindi
           level: Native
-
-        - idiom: French
-          level: Professional
-
-        - idiom: Spanish
-          level: Professional
 
     interests:
       title: Interests
       info:
-        - item: Climbing
+        - item: Coding
           link:
 
-        - item: Snowboarding
+        - item: Learning
           link:
 
-        - item: Cooking
+        - item: Automating Stuff
           link:
+
 
 career-profile:
     title: Career Profile
     summary: |
-      Summarise your career here lorem ipsum dolor sit amet, consectetuer
-      adipiscing elit. You can [download this free resume/CV template here]().
-      Aenean commodo ligula eget dolor aenean massa. Cum sociis natoque
-      penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-      Donec quam felis, ultricies nec, pellentesque eu.
-      Second paragraph if required.
+      Experienced SDE-3 with a proven track record of over 6 years in full-stack development. 
+      Skilled in Test-Driven Development, CI/CD implementation, and microservices architecture, 
+      I excel in crafting efficient, scalable, and innovative solutions.
+      With expertise in e-commerce platforms and a passion for driving innovation,
+      I have achieved exceptional performance metrics and enhanced user experiences.
+      Proficient in React, Next.js, Django, and React Native,
+      I am committed to delivering high-quality solutions that drive business success.
 education:
     title: Education
     info:
-      - degree: MSc in Computer Science
-        university: University of London
-        time: 2011 - 2012
+      - degree: BTech in Computer Science
+        university: Gurukula Kangri Vishwavidyalaya 
+        time: 2015 - 2019
         details: |
           Describe your study here lorem ipsum dolor sit amet, consectetuer
           adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum
@@ -77,9 +76,9 @@ education:
           pretium quis, sem.
             - Bullet point
             - Bullet point
-      - degree: BSc in Applied Mathematics
-        university: Bristol University
-        time: 2007 - 2011
+      - degree: Intermediate
+        university: Sri sai inter college 
+        time: 2012 - 2014
         details: |
           Describe your study here lorem ipsum dolor sit amet, consectetuer
           adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum
@@ -92,43 +91,80 @@ education:
 experiences:
     title: Experiences
     info:
-      - role: Lead Developer
-        time: 2015 - Present
-        company: Startup Hubs, San Francisco
+      - role: SDE-3
+        time: Dec 2023 - Present
+        company: Shyftlabs
         details: |
-          Describe your role here lorem ipsum dolor sit amet, consectetuer
-          adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.
-          Cum sociis natoque penatibus et magnis dis parturient montes,
-          nascetur ridiculus mus. Donec quam felis, ultricies nec,
-          pellentesque eu, pretium quis, sem. Nulla consequat massa quis
-          enim. Donec pede justo. Sed ut perspiciatis unde omnis iste natus
-          error sit voluptatem accusantium doloremque laudantium, totam rem
-          aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
-          architecto beatae vitae dicta sunt explicabo.
-            - Bullet point
-            - Bullet point
-      - role: Senior Software Engineer
-        time: 2014 - 2015
-        company: Google, London
+          - Transformed a fast API project into a Test-Driven Development (TDD) project, identifying and resolving over 90 critical bugs.
+          - Configured Tox for GitLab pipelines and CI/CD workflows.
+          - Led a project for pricing change implementation in offline pet stores for Petco, a US-based company.
+      - role: SDE-3
+        time: Apr 2021 - Nov 2023
+        company: ORNAZ
         details: |
-          Describe your role here lorem ipsum dolor sit amet, consectetuer
-          adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.
-          Cum sociis natoque penatibus et magnis dis parturient montes,
-          nascetur ridiculus mus. Donec quam felis, ultricies nec,
-          pellentesque eu, pretium quis, sem.
-            - Bullet point
-            - Bullet point
-      - role: UI Developer
-        time: 2012 - 2014
-        company: Amazon, London
+          Developed a desktop-specific e-commerce website using Next.js.
+          - Achieved lighthouse metrics of 99-100 and <500ms page load time.
+          - Integrated multiple payment gateways.
+          - Implemented PWA for enhanced user experience.
+
+          Implemented a custom user journey monitoring system.
+          - Monitored user journey in real-time.
+          - Sent push notifications and SMS to boost sales.
+
+          Migrated from monolithic to microservices architecture.
+          - Developed 4 main microservices, 2 service workers, and 3 main servers.
+          - Utilized high availability databases (2 master-3 slave) for main servers.
+
+          Achieved 0.01% downtime using Docker Swarm.
+          - Deployed alpha-beta testing strategies for seamless deployments.
+          - Optimized frontend caching for the fastest e-commerce app performance.
+          - Achieved API response time under 50ms-100ms.
+          - Improved customer satisfaction and retention.
+      - role: SDE-2
+        time: Apr 2020 - Apr 2021
+        company: ORNAZ
         details: |
-          Describe your role here lorem ipsum dolor sit amet, consectetuer
-          adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.
-          Cum sociis natoque penatibus et magnis dis parturient montes,
-          nascetur ridiculus mus. Donec quam felis, ultricies nec,
-          pellentesque eu, pretium quis, sem.
-            - Bullet point
-            - Bullet point
+          Developed mobile web, iOS, and Android apps using React Native.
+          - Reduced development time by 30% by utilizing React Native for cross-platform development.
+          - Increased user reach by 40% with apps compatible across multiple devices and platforms.
+
+          Transitioned to REST/GraphQL API, reducing server load by 70%.
+          - Improved system efficiency, resulting in a 50% reduction in response time.
+          - Enhanced scalability and performance, accommodating a 100% increase in user traffic.
+
+          Created an Augmented Reality (AR) based browser and native app using MediaPipe for a real-time ring trial store.
+          - Pioneered AR technology implementation, resulting in a 50% increase in user engagement.
+          - Provided an immersive shopping experience, leading to a 30% increase in sales conversion.
+
+          Developed a static image-based trial store for low-end devices.
+          - Improved accessibility, reaching users with low-end devices, resulting in a 20% increase in user base.
+          - Enhanced user experience, reducing load time by 40% and improving overall performance.          
+
+      - role: SDE-1
+        time: Nov 2018 - Apr 2020
+        company: ORNAZ
+        details: |
+          Built a mobile-friendly E-commerce system using Django MVT, integrating multiple payment gateways 
+          - and a user tracking system.
+          - Increased mobile sales by 40%.
+          - Reduced cart abandonment rate by 25%.
+          - Improved user engagement by 30% and returning customers by 20%.
+
+          Developed a robust CRM with customer journey analytics, lead management, product, pricing, order, factory, and raw material management.
+          - Increased sales efficiency by 50%.
+          - Reduced lead response time by 40%.
+          - Improved inventory turnover rate by 15%.
+
+          Created an Angular-based app for comparing diamonds in different sizes and settings.
+          - Increased user engagement by 25%.
+          - Decreased bounce rate by 20%.
+          - Improved user satisfaction by 35%.
+
+      - role: FullStack Developer-Intern
+        time: May 2018 - Nov 2018
+        company: ORNAZ
+        details: |
+            Migrated a Fully working E-commerce magento based project to Django framework.
 
 certifications:
       title: Certifications
@@ -255,11 +291,5 @@ skills:
       - name: HTML5 & CSS
         level: 95%
 
-      - name: Ruby on Rails
-        level: 85%
-
       - name: Sketch & Photoshop
         level: 60%
-
-footer: >
-    Designed with <i class="fas fa-heart"></i> by <a href="http://themes.3rdwavemedia.com" target="_blank" rel="nofollow">Xiaoying Riley</a>

@@ -1,8 +1,7 @@
-title: Hello, world! I'm David Freeman
+title: A journey to become a better senior Developer Everyday 
 description: > # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  I excel in agile environments, leveraging my expertise in Python, 
+  ReactJS, Django DRF, NodeJS, AWS, MySQL, and more to optimize performance and scalability.
 permalink: ':title/'
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
@@ -11,7 +10,14 @@ site-twitter: #if your site has a twitter account, enter it here
 # Author Settings
 author: Ashutosh Verma # add your name
 author-img: profile.jpeg # add your photo
-about-author: I am a web developer focusing on front-end development. Always hungry to keep learning. # add description
+about-author: > 
+  Experienced SDE-3 with a proven track record of over 6 years in full-stack development. 
+  Skilled in Test-Driven Development, CI/CD implementation, and microservices architecture, 
+  I excel in crafting efficient, scalable, and innovative solutions. 
+  With expertise in e-commerce platforms and a passion for driving innovation, 
+  I have achieved exceptional performance metrics and enhanced user experiences. 
+  Proficient in React, Next.js, Django, and React Native, 
+  I am committed to delivering high-quality solutions that drive business success.
 social-twitter: ashu_just_ashu # add your Twitter handle
 social-facebook: # add your Facebook handle
 social-github: vKrypto # add your Github handle
