@@ -12,12 +12,7 @@ author: Ashutosh Verma # add your name
 author-img: profile.jpeg # add your photo
 about-author: > 
   Experienced SDE-3 with a proven track record of over 6 years in full-stack development. 
-  Skilled in Test-Driven Development, CI/CD implementation, and microservices architecture, 
-  I excel in crafting efficient, scalable, and innovative solutions. 
-  With expertise in e-commerce platforms and a passion for driving innovation, 
-  I have achieved exceptional performance metrics and enhanced user experiences. 
-  Proficient in React, Next.js, Django, and React Native, 
-  I am committed to delivering high-quality solutions that drive business success.
+  Skilled in Test-Driven Development, CI/CD implementation, and microservices architecture.
 social-twitter: ashu_just_ashu # add your Twitter handle
 social-facebook: # add your Facebook handle
 social-github: vKrypto # add your Github handle
