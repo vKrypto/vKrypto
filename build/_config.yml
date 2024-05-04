@@ -5,7 +5,7 @@ description: > # this means to ignore newlines until "baseurl:"
 permalink: ':title/'
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-site-twitter: #if your site has a twitter account, enter it here
+site-twitter: ashu_just_ashu #if your site has a twitter account, enter it here
 
 # Author Settings
 author: Ashutosh Verma # add your name
@@ -38,7 +38,7 @@ exclude: ["node_modules", "gulpfile.js", "package.json", "yarn.lock"]
 
 # cv-specific config
 theme_skin: blue
-chrome_mobile_color: #use hex colors (ex:#1976d2) or leave empty if you don't want a color for chrome mobile searchbar
+chrome_mobile_color: "#42A8C0" #use hex colors (ex:#1976d2) or leave empty if you don't want a color for chrome mobile searchbar
 # Sass/SCSS
 sass:
   sass_dir: _sass
