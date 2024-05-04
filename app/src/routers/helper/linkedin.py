@@ -1,16 +1,15 @@
 import requests
 import urllib.parse
 import jwt
+from decouple import config
 
 
-LINKED_IN_CLIENT_ID = "86hunnabauzv6z"
-LINKED_IN_CLIENT_SECRET = "DDlE2aBUGJHwNrxI"
-REDIRECT_URI = "http://127.0.0.1:8000/linkedin/login/callback"
+
 
 
 class LinkedApiManager:
-    client_id = LINKED_IN_CLIENT_ID
-    client_secret = LINKED_IN_CLIENT_SECRET
+    client_id = config("LINKED_IN_CLIENT_ID", None)
+    client_secret = config("LINKED_IN_CLIENT_SECRET", None)
     scope = "openid profile w_member_social email"
     def __init__(self):
         self.base_url = "https://www.linkedin.com/oauth/v2/"
@@ -21,7 +20,7 @@ class LinkedApiManager:
     
     @classmethod
     def get_authorization_redirect_url(cls, state:str="foobar") -> str:
-        url = urllib.parse.quote(REDIRECT_URI)
+        url = urllib.parse.quote(config("LINKED_IN_REDIRECT_URI", None))
         return "https://www.linkedin.com/oauth/v2/authorization?response_type=code&" \
                 + f"client_id={cls.client_id}&redirect_uri={url}&state={state}&scope={cls.scope}"
 
@@ -31,7 +30,7 @@ class LinkedApiManager:
             'code': code,
             'client_id': self.client_id,
             'client_secret': self.client_secret,
-            'redirect_uri': REDIRECT_URI,
+            'redirect_uri': config("LINKED_IN_REDIRECT_URI", None),
         }
         response = requests.post(self.token_url, data=data)
         if response.status_code == 200:
