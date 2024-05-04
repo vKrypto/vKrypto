@@ -7,3 +7,6 @@ bs4
 fastapi
 unvicorn
 pyjwt
+boto3
+python-multipart
+dotenv
