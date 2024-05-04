@@ -19,7 +19,7 @@ class FileManager:
     @classmethod
     async def upload_file(cls, file, folder_name) -> List[str]:
         hash = str(uuid.uuid4())[:10]
-        file_name = f"{folder_name}/{hash}_{file.filename[-10:]}"
+        file_name = f"uploaded_assets/{folder_name}/{hash}_{file.filename[-10:]}"
         # UploadFile(filename='25729859.jpeg', 
         #   size=19079, 
         #   headers=Headers(
@@ -28,5 +28,9 @@ class FileManager:
             #  'content-type': 'image/jpeg'}
             # )
         # )
-        cls.__s3_client.upload_fileobj(file.file, cls.BUCKET_NAME, file_name)
+        cls.__s3_client.upload_fileobj(
+            file.file, cls.BUCKET_NAME, file_name, ExtraArgs={'ACL': 'public-read'}
+        )
         return f"{cls.s3_url_prefix}/{file_name}"
+
+
