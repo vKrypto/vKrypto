@@ -887,7 +887,7 @@ table tfoot td {
   max-width: 1250px;
   position: relative;
   margin:auto;
-  height: 100vh;
+  min-height: 100vh;
   box-shadow: 1px 1px 3px 3px rgba(31, 35, 46, 0.15);
   background-color: #fbfbfb;
 }
@@ -1485,7 +1485,7 @@ a.newer-posts:hover {
   }
 }
 
-.add-post-btn > a > i:hover {
+.add-post-btn > a:hover {
   color: white;
   background-color: #42A8C0;
 }
