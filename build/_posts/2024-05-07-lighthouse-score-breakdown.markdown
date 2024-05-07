@@ -2,7 +2,9 @@
 layout: post
 title: "🚀 Achieving 100/100 Lighthouse Metrics: A Technical Breakdown"
 date: 2024-04-24 13:32:20 +0300
-description: Embark on a journey to become a better Senior Developer with this comprehensive learning plan! Master Data Structures, Algorithms, Databases, Networking, Distributed Systems, Cloud Services, and more. Level up your skills and aim for L4-L6 roles with a salary range of $60k-$90k. Let's level up together! 🚀💪 # Add post description (optional)
+description: 
+    -Ornaz.com - Explore the Technical Breakdown of Achieving 100/100 Lighthouse Metrics. 
+    Discover how we optimize online shopping experiences with lightning-fast performance and superior SEO solutions. 🚀💪 # Add post description (optional)
 tags: [ ornaz, EcommerceRevolution, WebsitePerformance]
 img: ornaz-lighthouse-breakdown/diagram.png
 ---
