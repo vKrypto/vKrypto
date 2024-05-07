@@ -5,7 +5,7 @@ date: 2024-04-27 13:32:20 +0300
 description: Experience the future of online shopping with ORNAZ - the ultra-fast, SEO-friendly e-commerce platform with a perfect 100/100 Lighthouse score! Say goodbye to slow loading times and hello to seamless browsing. Try it now!. # Add post description (optional)
 fig-caption: LightHouse metrics for ORNAZ home Page # Add figcaption (optional)
 img: ornaz-lighthouse/ornaz_1.png
-tags: [ WebsitePerformance , SEOBoost , EcommerceOptimization , FrontEndDevelopment ]
+tags: [ ornaz, WebsitePerformance , SEOBoost , EcommerceOptimization , FrontEndDevelopment ]
 ---
 🚀 Tired of waiting for slow-loading websites? So were we!
 

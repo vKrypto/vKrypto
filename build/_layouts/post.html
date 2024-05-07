@@ -22,9 +22,27 @@ layout: main
       {{content | markdownify}}
       <div class="page-footer">
         <div class="page-share">
-          <a href="https://twitter.com/intent/tweet?text={{ page.title }}&url={{ site.url }}{{ page.url }}" title="Share on Twitter" rel="nofollow" target="_blank">Twitter</a>
-          <a href="https://facebook.com/sharer.php?u={{ site.url }}{{ page.url }}" title="Share on Facebook" rel="nofollow" target="_blank">Facebook</a>
-          <a href="https://plus.google.com/share?url={{ site.url }}{{ page.url }}" title="Share on Google+" rel="nofollow" target="_blank">Google+</a>
+          <a href="https://twitter.com/intent/tweet?text={{ page.title }}%0A%0ACheckout this Article:&url={{ site.url }}{{ page.url }}&hashtags={{page.tags}}" title="Share on Twitter" rel="nofollow" target="_blank">Twitter</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u={{ site.url }}{{ page.url }}" title="Share on Facebook" rel="nofollow" target="_blank">Facebook</a>
+          <a href="https://reddit.com/submit?url={{ site.url }}{{ page.url }}&title={{ page.title }}" title="Share on Reddit" rel="nofollow" target="_blank">Reddit</a>
+          <a href="https://www.tumblr.com/widgets/share/tool?canonicalUrl={{ site.url }}{{ page.url }}&title={{ page.title }}&caption={{ page.description }}&tags={{page.tags}}" title="Share on Tumblr" rel="nofollow" target="_blank">Tumblr</a>
+          <a href="https://www.blogger.com/blog-this.g?u={{ site.url }}{{ page.url }}&n={{ page.title }}&t={{ page.description }}" title="Share on Blogger" rel="nofollow" target="_blank">Blogger</a>
+          <a href="https://t.me/share/url?text={{ page.title }}%0A%0ACheckout this Article:&url={{ site.url }}{{ page.url }}" title="Share on Telegram" rel="nofollow" target="_blank">Telegram</a>
+
+          <a href="https://www.linkedin.com/feed/?shareActive=true&text={{ page.title }}%0A%0A{{page.description}}%0A%0ACheckout this Article:%0A{{ site.url }}{{ page.url }}" title="Share on LinkedIn" rel="nofollow" target="_blank">LinkedIn</a>
+        
+          <a href="https://news.ycombinator.com/submitlink?u={{ site.url }}{{ page.url }}&t={{ page.title }}" title="Share on ycombinator" rel="nofollow" target="_blank">yCombinator</a>
+          <a href="https://www.evernote.com/clip.action?url={{ site.url }}{{ page.url }}&title={{ page.title }}" title="Share on evernote" rel="nofollow" target="_blank">Evernote</a>
+          <a href="http://www.livejournal.com/update.bml?subject={{ page.title }}&event={{ site.url }}{{ page.url }}" title="Share on livejournal" rel="nofollow" target="_blank">LiveJournal</a>
+          <a href="http://www.instapaper.com/edit?url={{ site.url }}{{ page.url }}&title={{ page.title }}&description={{ page.description }}" title="Share on instapaper" rel="nofollow" target="_blank">InstaPaper</a>
+
+          <!-- 
+          http://pinterest.com/pin/create/button/?url={url}
+          http://pinterest.com/pin/create/link/?url={url}
+          
+          -->
+          
+          <a href="whatsapp://send/?text={{ page.title }}%0A%0ACheckout this Article %0A{ site.url }}{{ page.url }}" title="Share on WhatsApp" rel="nofollow" target="_blank">WhatsApp</a>
         </div>
         <div class="page-tag">
           {% for tag in page.tags %}
