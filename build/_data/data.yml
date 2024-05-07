@@ -166,7 +166,7 @@ experiences:
         details: |
             Migrated a Fully working E-commerce magento based project to Django framework.
 
-certifications:
+certifications1:
       title: Certifications
       list:
         - name: CV Builder
@@ -207,7 +207,7 @@ certifications:
             Praesent felis nibh, eleifend id eleifend id, dictum id enim.
             Praesent venenatis erat non augue suscipit consectetur.
 
-projects:
+projects1:
     title: Projects
     intro: >
       You can list your side projects in this
@@ -234,7 +234,7 @@ projects:
         link: "#"
         tagline: "A responsive Bootstrap one page theme designed to help app developers promote their mobile apps"
 
-oss:
+oss1:
     title: OSS Contributions
     intro: >
       You can list your open source software contributions in this
@@ -253,7 +253,7 @@ oss:
         link: "#"
         tagline: "A responsive Bootstrap one page theme designed to help app developers promote their mobile apps"
 
-publications:
+publications1:
     title: Publications
     intro: |
       You can list your publications in this section. Lorem ipsum dolor sit
@@ -275,7 +275,7 @@ publications:
         authors: Edgar T. Irons
         conference: "Comm. ACM 4 (1961), 51–55"
 
-skills:
+skills1:
     title: Skills &amp; Proficiency
 
     toolset:
