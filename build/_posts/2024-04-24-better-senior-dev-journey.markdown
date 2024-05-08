@@ -4,6 +4,7 @@ title: "🚀 Journey to Senior Developer 🚀"
 date: 2024-04-24 13:32:20 +0300
 description: Embark on a journey to become a better Senior Developer with this comprehensive learning plan! Master Data Structures, Algorithms, Databases, Networking, Distributed Systems, Cloud Services, and more. Level up your skills and aim for L4-L6 roles with a salary range of $60k-$90k. Let's level up together! 🚀💪 # Add post description (optional)
 tags: [ CareerGrowth ,LearningJourney ,TechSkills, interviewPrep]
+img: dsa/og-image.jpg
 ---
 🚀 Excited to kickstart my journey towards becoming a better Senior Developer! 🚀
 
