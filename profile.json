@@ -1,0 +1,876 @@
+{
+    "lastName": "Verma",
+    "student": false,
+    "$anti_abuse_metadata": {
+        "/lastName": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/phoneticFirstName": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/geoCountryUrn": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/entityUrn": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/elt": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/firstName": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/summary": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/address": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/geoLocationName": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/industryName": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/geoLocationBackfilled": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/phoneticLastName": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/versionTag": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/maidenName": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/student": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/headline": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/locationName": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/geoCountryName": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/industryUrn": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        },
+        "/showEducationOnProfileTopCard": {
+            "sourceUrns": {
+                "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+            }
+        }
+    },
+    "geoCountryUrn": "urn:li:fs_geo:102713980",
+    "geoLocationBackfilled": false,
+    "entityUrn": "urn:li:fs_profile:ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A",
+    "headline": "SDE-3 at Shyftlabs | Technical Head at ORNAZ",
+    "summary": "Experienced SDE-3 with a proven track record of over 6 years in full-stack development. Skilled in Test-Driven Development, CI/CD implementation, and microservices architecture, I excel in crafting efficient, scalable, and innovative solutions. With expertise in e-commerce platforms and a passion for driving innovation, I have achieved exceptional performance metrics and enhanced user experiences. Proficient in React, Next.js, Django, and React Native, I am committed to delivering high-quality solutions that drive business success.\n\nI excel in agile environments, leveraging my expertise in Python, Django DRF, NodeJS, AWS, MySQL, and more to optimize performance and scalability. I have successfully improved system efficiency, reducing response time by up to 70% and achieving 99-100 Lighthouse performance scores with <500ms page load time.\n\nDriven by the opportunity to use technology to solve complex problems, I am committed to staying ahead of the curve by constantly expanding my skill set. Whether it's building web applications from scratch or optimizing existing systems, I am dedicated to delivering outstanding results.\n\nIf you're seeking a skilled backend developer who can deliver exceptional performance and drive business growth, I'm eager to work with you. Let's connect and discuss how I can contribute to your projects and help you achieve your goals.",
+    "industryName": "Technology, Information and Internet",
+    "address": "Lucknow",
+    "locationName": "India",
+    "geoCountryName": "India",
+    "elt": false,
+    "profilePictureOriginalImage": {
+        "com.linkedin.common.VectorImage": {
+            "artifacts": [
+                {
+                    "width": 673,
+                    "fileIdentifyingUrlPathSegment": "900_1200/0/1713812644572?m=AQIQ_unUNqD1PAAAAY9IEsVkM1WrmR4RhBVj9jLwECaqlKHs3psoL2l7DQ&e=1714987540&v=beta&t=iYBS4srwMd7AQhQ0uc1IDivk1rdJQU8GVuwoDZ8Xieg",
+                    "expiresAt": 1714987540000,
+                    "height": 900
+                },
+                {
+                    "width": 336,
+                    "fileIdentifyingUrlPathSegment": "450_600/0/1713812644572?m=AQK9iCU12jlyMAAAAY9IEsVk5Q2azhedTUGMtyRLk6cd_RvEd-LFkfuUsQ&e=1714987540&v=beta&t=gVlrZaYKT1FKAWba4qv1eJS2wRVLfEZv99ozlMrz2S8",
+                    "expiresAt": 1714987540000,
+                    "height": 450
+                }
+            ],
+            "rootUrl": "https://www.linkedin.com/dms/prv/image/D5604AQGK2_nWcKtsYA/profile-originalphoto-shrink_"
+        }
+    },
+    "birthDate": {
+        "month": 2,
+        "day": 4
+    },
+    "industryUrn": "urn:li:fs_industry:6",
+    "firstName": "Ashutosh",
+    "profilePicture": {
+        "displayImage": "urn:li:digitalmediaAsset:D5603AQGnNETuHNee5g",
+        "originalImage": "urn:li:digitalmediaAsset:D5604AQGK2_nWcKtsYA",
+        "photoFilterEditInfo": {
+            "bottomLeft": {
+                "x": 0.0,
+                "y": 0.8738888888888889
+            },
+            "saturation": 0.0,
+            "brightness": 0.0,
+            "vignette": 0.0,
+            "photoFilterType": "GURU",
+            "bottomRight": {
+                "x": 1.0000000000000002,
+                "y": 0.8738888888888889
+            },
+            "topLeft": {
+                "x": 0.0,
+                "y": 0.12611111111111095
+            },
+            "contrast": 0.0,
+            "topRight": {
+                "x": 1.0000000000000002,
+                "y": 0.12611111111111095
+            }
+        }
+    },
+    "geoLocation": {
+        "geoUrn": "urn:li:fs_geo:115884833",
+        "postalCode": "135133"
+    },
+    "geoLocationName": "Gurugram, Haryana",
+    "location": {
+        "basicLocation": {
+            "countryCode": "in",
+            "postalCode": "135133"
+        }
+    },
+    "backgroundPicture": {
+        "displayImage": "urn:li:digitalmediaAsset:D5616AQG6NjU7ZBpwZw",
+        "originalImage": "urn:li:digitalmediaAsset:D5604AQHSGP9y5hbpGA",
+        "photoFilterEditInfo": {
+            "bottomLeft": {
+                "x": 0.0,
+                "y": 0.9794520547945206
+            },
+            "saturation": 0.0,
+            "brightness": 0.0,
+            "vignette": 0.0,
+            "photoFilterType": "ORIGINAL",
+            "bottomRight": {
+                "x": 1.0,
+                "y": 0.9794520547945206
+            },
+            "topLeft": {
+                "x": 0.0,
+                "y": 0.02054794520547945
+            },
+            "contrast": 0.0,
+            "topRight": {
+                "x": 1.0,
+                "y": 0.02054794520547945
+            }
+        }
+    },
+    "backgroundPictureOriginalImage": {
+        "com.linkedin.common.VectorImage": {
+            "artifacts": [
+                {
+                    "width": 1400,
+                    "fileIdentifyingUrlPathSegment": "396_1584/0/1713905955714?m=AQIhk3o4mt5IlQAAAY9IEsVhTcbKp3St6ewQSkdWuriJTK1G1D4k0cAnNw&e=1714987540&v=beta&t=KfY1fLt5TMBl3UdxZIJRmLd8VfC31Ra3HJJC6l-6-Fk",
+                    "expiresAt": 1714987540000,
+                    "height": 365
+                },
+                {
+                    "width": 767,
+                    "fileIdentifyingUrlPathSegment": "200_800/0/1713905955714?m=AQJcAix8qH0ITwAAAY9IEsVhsRtSILdHjxg1ikdpOUA3t8_Gcn2u8dXR0w&e=1714987540&v=beta&t=ex_DrhCKeLfF6yOMcQaqb5oPkmrAtgfVt4vSwyPsziQ",
+                    "expiresAt": 1714987540000,
+                    "height": 200
+                }
+            ],
+            "rootUrl": "https://www.linkedin.com/dms/prv/image/D5604AQHSGP9y5hbpGA/profile-originalbackgroundimage-shrink_"
+        }
+    },
+    "displayPictureUrl": "https://media.licdn.com/dms/image/D5635AQEXMTTToUuYDQ/profile-framedphoto-shrink_",
+    "img_400_400": "400_400/0/1713906116402?e=1715508000&v=beta&t=NZRypA--DAjfFyLaNZJXi3GQYImBDZX-E-yRpCMlKQ4",
+    "img_200_200": "200_200/0/1713906116402?e=1715508000&v=beta&t=9q_jocXMq8PGl2uuO-pQJPUyZkyX43B7revKMPUYkpI",
+    "img_800_800": "800_800/0/1713906116402?e=1715508000&v=beta&t=9I32Kzd6llApovLgAPkT7Cpk5_auscvB7LSKn6yLO_g",
+    "img_100_100": "100_100/0/1713906116402?e=1715508000&v=beta&t=NXQE3v8bfiCyGSqk_MaMPnpG4K68jChTtMee6vjctA0",
+    "profile_id": "ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A",
+    "profile_urn": "urn:li:fs_miniProfile:ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A",
+    "member_urn": "urn:li:member:448070364",
+    "public_id": "ashutosh-verma-b90083106",
+    "experience": [
+        {
+            "locationName": "Gurugram, Haryana, India",
+            "entityUrn": "urn:li:fs_position:(ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A,2311904398)",
+            "$anti_abuse_metadata": {
+                "/geoUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/companyName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/companyUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/entityUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/geoLocationName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/promotion": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/title": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/region": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/locationName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/description": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                }
+            },
+            "geoLocationName": "Gurugram, Haryana, India",
+            "geoUrn": "urn:li:fs_geo:115884833",
+            "companyName": "ShyftLabs",
+            "timePeriod": {
+                "startDate": {
+                    "month": 12,
+                    "year": 2023
+                }
+            },
+            "description": "1) Transformed a fast API project into a Test-Driven Development (TDD) project, identifying and resolving over 90 critical bugs.\n2) Configured Tox for GitLab pipelines and CI/CD workflows.\n3) Led a project for pricing change implementation in offline pet stores for Petco, a US-based company.",
+            "company": {
+                "employeeCountRange": {
+                    "start": 51,
+                    "end": 200
+                },
+                "industries": [
+                    "Management Consulting"
+                ]
+            },
+            "title": "SDE-3",
+            "region": "urn:li:fs_region:(in,0)",
+            "companyUrn": "urn:li:fs_miniCompany:14653719",
+            "companyLogoUrl": "https://media.licdn.com/dms/image/D4E0BAQGWDtvTrgc-Dg/company-logo_"
+        },
+        {
+            "locationName": "Gurugram, Haryana, India",
+            "entityUrn": "urn:li:fs_position:(ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A,2051045458)",
+            "$anti_abuse_metadata": {
+                "/geoUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/companyName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/companyUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/entityUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/geoLocationName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/promotion": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/title": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/region": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/locationName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/description": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                }
+            },
+            "geoLocationName": "Gurugram, Haryana, India",
+            "geoUrn": "urn:li:fs_geo:115884833",
+            "companyName": "ORNAZ",
+            "timePeriod": {
+                "endDate": {
+                    "month": 11,
+                    "year": 2023
+                },
+                "startDate": {
+                    "month": 4,
+                    "year": 2021
+                }
+            },
+            "description": "Developed a desktop-specific e-commerce website using Next.js.\n>>> Achieved lighthouse metrics of 99-100 and <500ms page load time.\n>>> Integrated multiple payment gateways.\n>>> Implemented PWA for enhanced user experience.\n\nImplemented a custom user journey monitoring system.\n>>> Monitored user journey in real-time.\n>>> Sent push notifications and SMS to boost sales.\n\nMigrated from monolithic to microservices architecture.\n>>> Developed 4 main microservices, 2 service workers, and 3 main servers.\n>>> Utilized high availability databases (2 master-3 slave) for main servers.\n\nAchieved 0.01% downtime using Docker Swarm.\n>>> Deployed alpha-beta testing strategies for seamless deployments.\n>>> Optimized frontend caching for the fastest e-commerce app performance.\n>>> Achieved API response time under 50ms-100ms.\n>>> Improved customer satisfaction and retention.",
+            "company": {
+                "employeeCountRange": {
+                    "start": 51,
+                    "end": 200
+                },
+                "industries": [
+                    "Luxury Goods & Jewelry"
+                ]
+            },
+            "title": "SDE-3",
+            "region": "urn:li:fs_region:(in,0)",
+            "companyUrn": "urn:li:fs_miniCompany:24778373",
+            "companyLogoUrl": "https://media.licdn.com/dms/image/C560BAQGIuHB87_hJ0Q/company-logo_"
+        },
+        {
+            "locationName": "Gurugram, Haryana, India",
+            "entityUrn": "urn:li:fs_position:(ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A,1783638222)",
+            "$anti_abuse_metadata": {
+                "/geoUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/companyName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/companyUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/entityUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/geoLocationName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/promotion": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/title": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/region": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/locationName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/description": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                }
+            },
+            "geoLocationName": "Gurugram, Haryana, India",
+            "geoUrn": "urn:li:fs_geo:106442238",
+            "companyName": "ORNAZ.com",
+            "timePeriod": {
+                "endDate": {
+                    "month": 4,
+                    "year": 2021
+                },
+                "startDate": {
+                    "month": 4,
+                    "year": 2020
+                }
+            },
+            "description": "Developed mobile web, iOS, and Android apps using React Native.\n>>> Reduced development time by 30% by utilizing React Native for cross-platform development.\n>>> Increased user reach by 40% with apps compatible across multiple devices and platforms.\n\nTransitioned to REST/GraphQL API, reducing server load by 70%.\n>>> Improved system efficiency, resulting in a 50% reduction in response time.\n>>> Enhanced scalability and performance, accommodating a 100% increase in user traffic.\n\nCreated an Augmented Reality (AR) based browser and native app using MediaPipe for a real-time ring trial store.\n>>> Pioneered AR technology implementation, resulting in a 50% increase in user engagement.\n>>> Provided an immersive shopping experience, leading to a 30% increase in sales conversion.\n\nDeveloped a static image-based trial store for low-end devices.\n>>> Improved accessibility, reaching users with low-end devices, resulting in a 20% increase in user base.\n>>> Enhanced user experience, reducing load time by 40% and improving overall performance.",
+            "company": {
+                "employeeCountRange": {
+                    "start": 51,
+                    "end": 200
+                },
+                "industries": [
+                    "Luxury Goods & Jewelry"
+                ]
+            },
+            "title": "SDE-2",
+            "region": "urn:li:fs_region:(in,0)",
+            "companyUrn": "urn:li:fs_miniCompany:24778373",
+            "companyLogoUrl": "https://media.licdn.com/dms/image/C560BAQGIuHB87_hJ0Q/company-logo_"
+        },
+        {
+            "locationName": "Gurgaon, India",
+            "entityUrn": "urn:li:fs_position:(ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A,1474303383)",
+            "$anti_abuse_metadata": {
+                "/geoUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/companyName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/companyUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/entityUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/geoLocationName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/promotion": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/title": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/region": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/locationName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/description": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                }
+            },
+            "geoLocationName": "Gurgaon, India",
+            "companyName": "ORNAZ.com",
+            "timePeriod": {
+                "endDate": {
+                    "month": 4,
+                    "year": 2020
+                },
+                "startDate": {
+                    "month": 11,
+                    "year": 2018
+                }
+            },
+            "description": "1) Built a mobile-friendly E-commerce system using Django MVT, integrating multiple payment gateways \n>>>> and a user tracking system.\n>>>> Increased mobile sales by 40%.\n>>>> Reduced cart abandonment rate by 25%.\n>>>> Improved user engagement by 30% and returning customers by 20%.\n\n2) Developed a robust CRM with customer journey analytics, lead management, product, pricing, order, factory, and raw material management.\n>>>> Increased sales efficiency by 50%.\n>>>> Reduced lead response time by 40%.\n>>>> Improved inventory turnover rate by 15%.\n\n3) Created an Angular-based app for comparing diamonds in different sizes and settings.\n>>>> Increased user engagement by 25%.\n>>>> Decreased bounce rate by 20%.\n>>>> Improved user satisfaction by 35%.",
+            "company": {
+                "employeeCountRange": {
+                    "start": 51,
+                    "end": 200
+                },
+                "industries": [
+                    "Luxury Goods & Jewelry"
+                ]
+            },
+            "title": "SDE-1",
+            "companyUrn": "urn:li:fs_miniCompany:24778373",
+            "companyLogoUrl": "https://media.licdn.com/dms/image/C560BAQGIuHB87_hJ0Q/company-logo_"
+        },
+        {
+            "locationName": "Gurgaon, India",
+            "entityUrn": "urn:li:fs_position:(ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A,1319469595)",
+            "$anti_abuse_metadata": {
+                "/geoUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/companyName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/companyUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/entityUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/geoLocationName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/promotion": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/title": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/region": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/locationName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/description": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                }
+            },
+            "geoLocationName": "Gurgaon, India",
+            "companyName": "ORNAZ.com",
+            "timePeriod": {
+                "endDate": {
+                    "month": 11,
+                    "year": 2018
+                },
+                "startDate": {
+                    "month": 5,
+                    "year": 2018
+                }
+            },
+            "company": {
+                "employeeCountRange": {
+                    "start": 51,
+                    "end": 200
+                },
+                "industries": [
+                    "Luxury Goods & Jewelry"
+                ]
+            },
+            "title": "Full stack developer Intern",
+            "companyUrn": "urn:li:fs_miniCompany:24778373",
+            "companyLogoUrl": "https://media.licdn.com/dms/image/C560BAQGIuHB87_hJ0Q/company-logo_"
+        }
+    ],
+    "education": [
+        {
+            "entityUrn": "urn:li:fs_education:(ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A,533762866)",
+            "school": {
+                "objectUrn": "urn:li:school:13489",
+                "entityUrn": "urn:li:fs_miniSchool:13489",
+                "active": true,
+                "schoolName": "Gurukula Kangri Vishwavidyalaya",
+                "trackingId": "hVfJzsXwSEGfet0g5cJRQA==",
+                "logoUrl": "https://media.licdn.com/dms/image/C560BAQEuCVZa8eoVHA/company-logo_"
+            },
+            "$anti_abuse_metadata": {
+                "/schoolUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/degreeUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/fieldOfStudy": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/activities": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/entityUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/grade": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/fieldOfStudyUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/schoolName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/degreeName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/description": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                }
+            },
+            "grade": "8.4",
+            "timePeriod": {
+                "endDate": {
+                    "year": 2019
+                },
+                "startDate": {
+                    "year": 2015
+                }
+            },
+            "degreeName": "Bachelor of Technology - BTech",
+            "schoolName": "Gurukula Kangri Vishwavidyalaya",
+            "fieldOfStudy": " ( computer science)",
+            "degreeUrn": "urn:li:fs_degree:250",
+            "schoolUrn": "urn:li:fs_miniSchool:13489"
+        },
+        {
+            "entityUrn": "urn:li:fs_education:(ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A,533763954)",
+            "$anti_abuse_metadata": {
+                "/schoolUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/degreeUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/fieldOfStudy": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/activities": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/entityUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/grade": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/fieldOfStudyUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/schoolName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/degreeName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/description": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                }
+            },
+            "grade": "88.8 %",
+            "timePeriod": {
+                "endDate": {
+                    "year": 2014
+                },
+                "startDate": {
+                    "year": 2012
+                }
+            },
+            "degreeName": "Intermediate",
+            "schoolName": "Sri sai inter college ",
+            "fieldOfStudy": "science"
+        },
+        {
+            "entityUrn": "urn:li:fs_education:(ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A,533764698)",
+            "$anti_abuse_metadata": {
+                "/schoolUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/degreeUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/fieldOfStudy": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/activities": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/entityUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/grade": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/fieldOfStudyUrn": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/schoolName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/degreeName": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                },
+                "/description": {
+                    "sourceUrns": {
+                        "com.linkedin.common.urn.MemberUrn": "urn:li:member:448070364"
+                    }
+                }
+            },
+            "grade": "91%",
+            "timePeriod": {
+                "endDate": {
+                    "year": 2012
+                },
+                "startDate": {
+                    "year": 2010
+                }
+            },
+            "degreeName": "High school",
+            "schoolName": "Sri sai inter college",
+            "fieldOfStudy": "science"
+        }
+    ],
+    "languages": [],
+    "publications": [],
+    "certifications": [],
+    "volunteer": [],
+    "honors": [],
+    "projects": [],
+    "skills": [
+        {
+            "name": "Performance Tuning"
+        },
+        {
+            "name": "Python (Programming Language)"
+        },
+        {
+            "name": "Selenium"
+        },
+        {
+            "name": "Selenium Testing"
+        }
+    ],
+    "urn_id": "ACoAABq1AtwBy4rWXzFsJcmKCaKJGYcBTnUKe9A"
+}
