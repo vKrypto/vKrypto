@@ -1,10 +1,12 @@
 ---
 layout: post
 title: "Diving Deep into DSA on My Journey to L5-L6! 🚀 "
-date: 2024-05-09 13:32:20 +0300
-description: In just 15 days, I'm diving deep into Data Structures and Algorithms (DSA) on my journey to becoming an L5-L6 developer! Follow along for more updates and tips as I progress on this exciting journey! 💻🚀 # Add post description (optional)
-tags: [ CareerGrowth ,LearningJourney ,TechSkills, interviewPrep, DataStructures, DSA, Algorithms, Programming]
+date: 2024-05-08 13:32:20 +0300
+description: 
+    -Ornaz.com - Explore the Technical Breakdown of Achieving 100/100 Lighthouse Metrics. 
+    Discover how we optimize online shopping experiences with lightning-fast performance and superior SEO solutions. 🚀💪 # Add post description (optional)tags: [ CareerGrowth ,LearningJourney ,TechSkills, interviewPrep, DataStructures, DSA, Algorithms, Programming]
 img: dsa/leetcode_profile.png
+tags: [ CareerGrowth ,LearningJourney ,TechSkills, interviewPrep, DataStructures, DSA, Algorithms, Programming]
 ---
 🚀 **Day 15 of my journey to becoming an L5-L6 developer!**
 
@@ -47,3 +49,5 @@ def rec(i):
 🚀 Excited to dive deeper into DSA and reach my goal of becoming an L5-L6 developer! 💪 Follow along for more updates and tips!
 
 📖 Following the roadmap on https://neetcode.io to master DSA!
+
+![](/assets/img/dsa/neetcode_update_1.png)
