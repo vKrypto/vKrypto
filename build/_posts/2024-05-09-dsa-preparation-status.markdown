@@ -47,5 +47,3 @@ def rec(i):
 🚀 Excited to dive deeper into DSA and reach my goal of becoming an L5-L6 developer! 💪 Follow along for more updates and tips!
 
 📖 Following the roadmap on https://neetcode.io to master DSA!
-
-![NeetCode](/assets/img/dsa/neetcode_update_1.png)
