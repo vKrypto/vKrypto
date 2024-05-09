@@ -3,7 +3,7 @@ layout: post
 title: "🚀 Achieving 100/100 Lighthouse Metrics: A Technical Breakdown"
 date: 2024-05-07 13:32:20 +0300
 description: 
-    -Ornaz.com - Explore the Technical Breakdown of Achieving 100/100 Lighthouse Metrics. 
+    Ornaz.com - Explore the Technical Breakdown of Achieving 100/100 Lighthouse Metrics. 
     Discover how we optimize online shopping experiences with lightning-fast performance and superior SEO solutions. 🚀💪 # Add post description (optional)
 tags: [ ornaz, EcommerceRevolution, WebsitePerformance]
 img: ornaz-lighthouse-breakdown/diagram.png
