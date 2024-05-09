@@ -61,8 +61,11 @@
   {% endif %}
   {% if page.img %}
     <meta name="twitter:image:src" content="{{ site.url }}{{ site.baseurl }}/assets/img/{{ page.img }}">
+    {% if page.large_image %}
+      <meta name="twitter:card" content="summary_large_image">
+    {% endif %}
     {% if page.description %}
-    <meta name="twitter:image:alt" content="{{ page.description }}">
+      <meta name="twitter:image:alt" content="{{ page.description }}">
     {% endif %}
   {% else %}
     <meta name="twitter:image:src" content="{{ site.url }}{{ site.baseurl }}/assets/img/{{ site.author-img }}">

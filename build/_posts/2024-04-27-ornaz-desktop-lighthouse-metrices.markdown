@@ -6,6 +6,7 @@ description: Experience the future of online shopping with ORNAZ - the ultra-fas
 fig-caption: LightHouse metrics for ORNAZ home Page # Add figcaption (optional)
 img: ornaz-lighthouse/ornaz_1-min.png
 tags: [ ornaz, WebsitePerformance , SEOBoost , EcommerceOptimization , FrontEndDevelopment ]
+large_image: true
 ---
 🚀 Tired of waiting for slow-loading websites? So were we!
 
