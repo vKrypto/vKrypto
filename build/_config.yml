@@ -18,6 +18,7 @@ social-facebook: # add your Facebook handle
 social-github: vKrypto # add your Github handle
 social-linkedin: ashutosh-verma-b90083106/ # add your Linkedin handle
 social-email: ashutosh.career19@gmail.com # add your Email address
+social-medium: ashutosh.career19
 # Disqus
 discus-identifier: mr-brown # add your discus identifier
 
@@ -30,7 +31,6 @@ plugins:
   - jekyll-sitemap
   - jekyll-paginate
   - jemoji
-  - jekyll-pandoc
 
 paginate: 8
 paginate_path: "/page/:num"
