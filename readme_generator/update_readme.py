@@ -1,5 +1,6 @@
 import os
 import yaml
+from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 
 working__dir = os.path.dirname(str(__file__))
@@ -11,9 +12,9 @@ def main():
     # get context data
     with open(os.path.join(working__dir, "data.yml"), 'r') as file:
         context = yaml.safe_load(file)
+    context["now"] = datetime.now()
     # render template
     output = template.render(context)
-    print("output length: ", len(output))
     if not output:
         raise Exception("Could not render template")
     # write into final readme.md
