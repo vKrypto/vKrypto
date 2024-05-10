@@ -1,3 +1,3 @@
 RewriteEngine On
 RewriteCond %{HTTP_HOST} ^www\.ashutoshverma\.com [NC]
-RewriteRule ^(.*)$ http://ashutoshverma.com/$1 [L,R=301]
+RewriteRule ^(.*)$ https://ashutoshverma.com/$1 [L,R=301]
