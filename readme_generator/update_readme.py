@@ -13,11 +13,13 @@ def main():
         context = yaml.safe_load(file)
     # render template
     output = template.render(context)
+    print("output: ", output[:10])
     if not output:
         raise Exception("Could not render template")
     # write into final readme.md
     with open(os.path.join("README.md"), 'w') as file:
         file.write(output)
+    print("successfully written template into README.md")
 
 
 if __name__ == "__main__":
