@@ -24,9 +24,9 @@ jobs:
           python readme_generator/update_readme.py
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          git add -f README.md
           echo status
           git status
-          git add -f README.md
           git commit -a -m "README file rendered"
       
       - name: Push changes
