@@ -13,7 +13,7 @@ def main():
         context = yaml.safe_load(file)
     # render template
     output = template.render(context)
-    print("output: ", output[:10])
+    print("output length: ", len(output))
     if not output:
         raise Exception("Could not render template")
     # write into final readme.md
