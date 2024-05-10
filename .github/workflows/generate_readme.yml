@@ -22,9 +22,6 @@ jobs:
           python -m pip install pyyaml
           python -m pip install jinja2
           python readme_generator/update_readme.py
-
-      - name: Commit changes
-        run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           echo status
