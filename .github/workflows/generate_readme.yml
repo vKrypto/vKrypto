@@ -20,6 +20,7 @@ jobs:
           git fetch origin main
           git checkout main
           git rebase dev
+          git rebase --skip
           git push origin main
 
   generate-readme:
