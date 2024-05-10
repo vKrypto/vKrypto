@@ -4,7 +4,7 @@
 <h1 align="center">I'm Ashutosh Verma 😀</h1>
 
 
-🏆 Generative AI Engineer | ❖ Enterprise Architect/Solution Architect | 🔮 Data Scientist | ❖ Software Engineering | ❖ Cloud Migration/Integration | ❖ Project Management | ❖ Business Analysis | ❖ Product Development | ❖ 20+ Years Exp ❖ Visionary Enterprise Architect
+Enterprise Architect/Solution Architect | 🔮 Data Scientist | ❖ Software Engineering | ❖ Cloud Migration/Integration | ❖ Project Management | ❖ Business Analysis | ❖ Product Development | ❖ 20+ Years Exp ❖ Visionary Enterprise Architect
 
 
 
