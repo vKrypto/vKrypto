@@ -26,7 +26,8 @@ jobs:
           git config --local user.name "GitHub Action"
           echo status
           git status
-          git add README.md
+          git add -f README.md
+          git commit -a -m "README file rendered"
       
       - name: Push changes
         uses: ad-m/github-push-action@master
