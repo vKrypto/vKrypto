@@ -19,7 +19,8 @@ jobs:
           git config --local user.name "GitHub Action"
           git fetch origin main
           git checkout main
-          git merge --no-ff --allow-unrelated-histories --no-edit dev
+          git rebase dev
+          git rebase --skip
           git push origin main
 
   generate-readme:
@@ -43,8 +44,6 @@ jobs:
       
       - name: Resolve merge conflicts
         run: |
-          git checkout --theirs .github/workflows/generate_readme.yml
-          git checkout --theirs task_plan.md
           git add .
           git commit -m "Merge conflict resolution"
       

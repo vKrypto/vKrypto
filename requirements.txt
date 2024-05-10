@@ -5,7 +5,7 @@ imgkit
 jinja2
 bs4
 fastapi
-unvicorn
+uvicorn
 pyjwt
 boto3
 python-multipart
