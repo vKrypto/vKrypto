@@ -41,6 +41,13 @@ jobs:
           python -m pip install jinja2
           python readme_generator/update_readme.py
       
+      - name: Resolve merge conflicts
+        run: |
+          git checkout --theirs .github/workflows/generate_readme.yml
+          git checkout --theirs task_plan.md
+          git add .
+          git commit -m "Merge conflict resolution"
+      
       - name: Commit Changes
         run: |
           git config --local user.email "action@github.com"
