@@ -38,6 +38,13 @@ layout: default
         {% if site.social-medium %}
           <li class="medium"><a href="https://medium.com/@{{site.social-medium}}" target="_blank"><i class="fa fa-medium"></i></a></li>
         {% endif %}
+        {% if site.social-leetcode %}
+          <li class="leetcode" style="width:30px;"><a href="https://leetcode.com/u/{{site.social-leetcode}}" target="_blank" style="padding:0">
+            <i class="fa fa-leetcode">
+              <img src="https://user-images.githubusercontent.com/36547915/97088991-45da5d00-1652-11eb-900f-80d106540f4f.png" />
+            </i>
+          </a></li>
+        {% endif %}
         {% if site.social-email %}
           <li class="email"><a href="mailto:{{site.social-email}}"><i class="fa fa-envelope-o"></i></a></li>
         {% endif %}
