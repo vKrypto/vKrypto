@@ -13,7 +13,6 @@ Enterprise Architect/Solution Architect | 🔮 Data Scientist | ❖ Software Eng
 # 👋 About Me ❤️:
 
 
-- 🌱 I’m currently working Generative AI, MLOPS, Data Analytics...
 - My git repository https://github.com/vkrypto
 - 📫 How to reach me: <a href="mailto:ashutosh.career19@gmail.com">ashutosh.career19@gmail.com</a>
 - ⚡ In my free time, I love to learn new technologies.
