@@ -18,7 +18,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git fetch origin main
-          git rebase --strategy recursive --strategy-option theirs main
+          git rebase --strategy recursive --strategy-option theirs origin main
           git checkout main
           git merge development --allow-unrelated-histories
           git push origin main
