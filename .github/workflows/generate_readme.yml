@@ -19,7 +19,8 @@ jobs:
           git config --local user.name "GitHub Action"
           git fetch origin main
           git checkout main
-          git merge dev --allow-unrelated-histories
+          git pull
+          git merge development --allow-unrelated-histories
           git push origin main
 
   generate-readme:
