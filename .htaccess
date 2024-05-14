@@ -3,5 +3,5 @@ RewriteEngine On
 RewriteCond %{HTTP_HOST} ^www\.ashutoshverma\.com [NC]
 RewriteRule ^(.*)$ https://ashutoshverma.com/$1 [L,R=301]
 
-RewriteCond %{REQUEST_URI} ^/vqlhujhsqq/$ [NC]
+RewriteCond %{REQUEST_URI} ^/vqlhujhsqq.*$ [NC]
 RewriteRule ^(.*)$ https://ashutoshverma.com [L,R=301]
