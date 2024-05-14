@@ -19,6 +19,9 @@ jobs:
           git config --local user.name "GitHub Action"
           git fetch origin main
           git checkout main
+          git checkout development
+          git rebase --strategy recursive --strategy-option theirs main
+          git checkout main
           git merge development --allow-unrelated-histories
           git push origin main
 
