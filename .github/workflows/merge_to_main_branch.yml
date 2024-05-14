@@ -1,4 +1,4 @@
-name: Update README on Main Branch
+name: Merge Code to Main Branch from development
 
 on:
   push:
