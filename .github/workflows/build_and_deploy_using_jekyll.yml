@@ -34,13 +34,13 @@ jobs:
       
       - name: Resolve merge conflicts
         run: |
+          git config --global  user.email "action@github.com"
+          git config --global user.name "GitHub Action"
           git add .
           git commit -m "Merge conflict resolution"
       
       - name: Commit Changes
         run: |
-          git config --global  user.email "action@github.com"
-          git config --global user.name "GitHub Action"
           git add README.md
       
       - name: Push changes
