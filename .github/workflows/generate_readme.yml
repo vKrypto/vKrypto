@@ -13,13 +13,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Merge to Main
-        if: github.ref == 'refs/heads/dev'
+        if: github.ref == 'refs/heads/development'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git fetch origin main
           git checkout main
-          git pull
           git merge development --allow-unrelated-histories
           git push origin main
 
