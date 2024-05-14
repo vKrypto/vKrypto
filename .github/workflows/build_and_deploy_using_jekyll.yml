@@ -26,21 +26,21 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Generate README
+      - name: Setup main repo
         run: |
-          python -m pip install pyyaml
-          python -m pip install jinja2
-          python readme_generator/update_readme.py
-      
-      - name: Resolve merge conflicts
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git fetch origin main
+          git checkout main
+
+      - name: Generate README file
         run: |
-          git config --global  user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git add .
-          git commit -m "Merge conflict resolution"
-          git push origin main
-      
-      - name: Commit Changes
+            python -m pip install pyyaml
+            python -m pip install jinja2
+            python readme_generator/update_readme.py
+        
+        
+      - name: Adding Changes
         run: |
           git add README.md
       
