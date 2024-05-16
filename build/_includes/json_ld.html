@@ -8,8 +8,6 @@
         "url": "{{ site.url }}{{ page.url }}"
 		{% if page.img %}"image": "{{ site.url }}{{ site.baseurl }}/assets/img/{{ page.img }}", {% endif %}
         "award": "Best Programming Related Blog ",
-		"keywords": [{% for tag in page.tags %}"{{tag}}",{% endfor %}],
-		"genre": [{% for tag in page.tags %}"{{tag}}",{% endfor %}],
 	}
 </script>
 {% endif %}
