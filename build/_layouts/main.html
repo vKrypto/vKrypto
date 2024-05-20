@@ -49,8 +49,8 @@ layout: default
         {% if site.social-linkedin %}
           <li class="linkedin"><a href="https://linkedin.com/in/{{site.social-linkedin}}" target="_blank"><i class="fa fa-linkedin"></i></a></li>
         {% endif %}
-        {% if site.social-medium %}
-          <li class="medium"><a href="https://medium.com/@{{site.social-medium}}" target="_blank"><i class="fa fa-medium"></i></a></li>
+        {% if site.social-medium-url %}
+          <li class="medium"><a href="{{site.social-medium-url}}" target="_blank"><i class="fa fa-medium"></i></a></li>
         {% endif %}
         {% if site.social-leetcode %}
           <li class="leetcode" style="width:30px;"><a href="https://leetcode.com/u/{{site.social-leetcode}}" target="_blank" style="padding:0">
