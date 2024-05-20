@@ -40,7 +40,7 @@ plugins:
   - jekyll-feed
 
 feed:
-  path: feed.xml
+  path: atom-feed.xml
   tags: true
 
 paginate: 8

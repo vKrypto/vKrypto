@@ -38,7 +38,7 @@ For more detailed information, you can visit his [LinkedIn profile](https://www.
 ==Social Profiles <ref>https://www.ashutoshverma.com</ref>==
 * [https://twitter.com/ashu_just_ashu Twitter]
 * [https://github.com/vKrypto Github]
-* [https://in.linkedin.com/in/ashutosh-verma-b90083106 LinkedIN]
+* [https://linkedin.com/in/ashutosh-verma-b90083106 LinkedIN]
 * [https://medium.com/@ashutosh.career19 Medium]
 * [https://github.com/vKrypto LeetCode]
 * [https://www.ashutoshverma.com ashutoshverma.com]
@@ -51,14 +51,14 @@ For more detailed information, you can visit his [LinkedIn profile](https://www.
 '''Bachelor of Technology'''  
 Gurukul Kangri University (2015 - 2019)
 
-== Skills <ref>https://in.linkedin.com/in/ashutosh-verma-b90083106</ref>==
+== Skills <ref>https://linkedin.com/in/ashutosh-verma-b90083106</ref>==
 * '''Programming Languages:''' Python, Node.js, Java, JavaScript, TypeScript, Go, PHP, HTML, CSS, Batch, C++
 * '''Frameworks/Libraries:''' Django, FastAPI, React Native, Selenium, ReactJS, VueJS, ElectronJS, Pytest
 * '''Databases:''' PostgreSQL, SQLite, Redis, MongoDB, Snowflake, Firebase
 * '''Tools:''' Git, Docker, Kubernetes, Sentry, JMeter, RabbitMQ, Kafka, Jenkins, Tox, GitHub Actions
 * '''Other Skills:''' Nginx, Apache, CDN, AWS Services, Technical Writing, Android Studio, Xcode
 
-== Professional Experience <ref>https://in.linkedin.com/in/ashutosh-verma-b90083106</ref>==
+== Professional Experience <ref>https://linkedin.com/in/ashutosh-verma-b90083106</ref>==
 
 === SDE-3 at Shyftlabs (December 2023 - Present) ===
 * Configured Tox for GitLab pipelines and CI/CD workflows.
@@ -77,7 +77,7 @@ Gurukul Kangri University (2015 - 2019)
 * Built a mobile-friendly e-commerce system using Django, improving mobile sales and reducing cart abandonment rates.
 * Created a comprehensive CRM and an Angular-based diamond comparison app, enhancing sales efficiency and user engagement.
 
-== Notable Projects <ref>https://in.linkedin.com/in/ashutosh-verma-b90083106</ref>==
+== Notable Projects <ref>https://linkedin.com/in/ashutosh-verma-b90083106</ref>==
 * '''[https://www.ornaz.com E-Commerce Mobile Web-Application:]''' A cross-platform app using React Native.
 * '''[https://www.ornaz.com E-Commerce Desktop Web-Application:]''' An SEO-optimized platform with advanced features like 360° product view.
 * '''[https://ornaz.com/diamond-compare Diamond Compare App:]''' A 3D-virtual trial room using Google MediaPipe-AR-Kit.
