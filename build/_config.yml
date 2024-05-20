@@ -37,6 +37,11 @@ plugins:
   - jekyll-paginate
   - jemoji
   - jekyll-seo-tag
+  - jekyll-feed
+
+feed:
+  path: feed.xml
+  tags: true
 
 paginate: 8
 paginate_path: "/page/:num"

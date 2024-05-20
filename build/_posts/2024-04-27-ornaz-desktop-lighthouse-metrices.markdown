@@ -20,9 +20,9 @@ Even giants like Flipkart and Amazon are struggling at 75-80, but we've set a ne
 Go and experience it yourself at [ORNAZ](https://www.ornaz.com/) desktop version.
 
 
-<img src="/assets/img/ornaz-lighthouse/ornaz_2.png" />
-<img src="/assets/img/ornaz-lighthouse/ornaz_3.png" />
-<img src="/assets/img/ornaz-lighthouse/flipkart.png" />
-<img src="/assets/img/ornaz-lighthouse/amazon.png" />
+<img src="{{site.url}}{{site.baseurls}}/assets/img/ornaz-lighthouse/ornaz_2.png" />
+<img src="{{site.url}}{{site.baseurls}}/assets/img/ornaz-lighthouse/ornaz_3.png" />
+<img src="{{site.url}}{{site.baseurls}}/assets/img/ornaz-lighthouse/flipkart.png" />
+<img src="{{site.url}}{{site.baseurls}}/assets/img/ornaz-lighthouse/amazon.png" />
 
 

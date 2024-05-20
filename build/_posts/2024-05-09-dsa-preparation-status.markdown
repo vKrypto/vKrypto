@@ -49,4 +49,4 @@ def rec(i):
 
 📖 Following the roadmap on https://neetcode.io to master DSA!
 
-![](/assets/img/dsa/neetcode_update_1.png)
+![]({{site.url}}{{site.baseurls}}/assets/img/dsa/neetcode_update_1.png)
