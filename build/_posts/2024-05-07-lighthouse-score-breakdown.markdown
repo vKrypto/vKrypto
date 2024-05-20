@@ -95,7 +95,7 @@ In my [previous post](https://ashutoshverma.com/ornaz-desktop-lighthouse-metrice
 
 Stay tuned for more insights on how we optimized SEO and much more!
 
-## ** Basic Overview of Architecture **
+## Basic Overview of Architecture
 
 ![](https://s3.ap-south-1.amazonaws.com/ashutoshverma.com/uploaded_assets/lighthouse-breakdown/79ead05f-3_iagram.png)
 
