@@ -18,6 +18,9 @@ layout: none
 				<guid isPermaLink="true">{{ site.url }}{{ post.url }}</guid>
                 {% if post.img %}
                     <enclosure url="{{ site.url }}/assets/img/{{ post.img }}" type="image/jpeg" />
+					<media:content url="{{ site.url }}/assets/img/{{ post.img }}" medium="image">
+						<media:title>Open Graph Image</media:title>
+					</media:content>
                 {% endif %}
 			</item>
 		{% endfor %}
