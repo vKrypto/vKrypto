@@ -4,7 +4,7 @@ title: Website Optimization for SEO Purposes
 date: 2024-05-22 13:32:20 +0300
 description: Enhance your website's SEO performance with essential technical optimizations. Learn how to create and update a sitemap.xml, configure robots.txt, utilize data feeds, leverage Google Search Console insights, and implement canonical links for improved indexing and ranking.. # Add post description (optional)
 fig-caption: LightHouse metrics for ORNAZ home Page # Add figcaption (optional)
-img: optimize_web_for_seo.png
+img: optimize_web_for_seo.webp
 tags: [ ornaz, SEOBoost , EcommerceOptimization , FrontEndDevelopment, Technical SEO optimization, Sitemap.xml configuration, Robots.txt instructions, Data feed implementation, Google Search Console insights, Canonical links for SEO, Website indexing strategies, SEO best practices, Website crawlability, SEO for website visibility]
 large_image: true
 ---

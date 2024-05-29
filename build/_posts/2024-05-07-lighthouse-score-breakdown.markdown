@@ -6,7 +6,7 @@ description:
     Ornaz.com - Explore the Technical Breakdown of Achieving 100/100 Lighthouse Metrics. 
     Discover how we optimize online shopping experiences with lightning-fast performance and superior SEO solutions. 🚀💪 # Add post description (optional)
 tags: [ ornaz, EcommerceRevolution, WebsitePerformance]
-img: ornaz-lighthouse-breakdown/diagram.png
+img: ornaz-lighthouse-breakdown/diagram.webp
 ---
 In my [previous post](https://ashutoshverma.com/ornaz-desktop-lighthouse-metrices/) I shared how we achieved almost all **100/100 Lighthouse metrics**. Here’s a breakdown of how we did it:
 
