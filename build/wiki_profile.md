@@ -1,7 +1,7 @@
 {{Infobox person
 | honorific_prefix = 
 | name = Ashutosh Verma
-| image = https://www.ashutoshverma.com/assets/img/profile.jpeg
+| image = https://ashutoshverma.com/assets/img/profile.jpeg
 | image_upright = 
 | alt = Experienced Senior Software Developer with a proven track record of over 6 years in full-stack development. Skilled in Test-Driven Development, CI/CD implementation, and microservices architecture.
 | caption = Senior Software Developer
@@ -18,34 +18,34 @@
 | years_active = 2015–present
 | employer = Shyftlabs
 | known_for = Full Stack Development, Test-Driven Development, CI/CD Implementation, Microservices Architecture, Performance Tuning, Agile Development
-| notable_works = [https://www.ashutoshverma.com/ornaz-desktop-lighthouse-metrices/ Broke Lighthouse Metrics]
+| notable_works = [https://ashutoshverma.com/ornaz-desktop-lighthouse-metrices/ Broke Lighthouse Metrics]
 | television = 
 | title = SDE-3
 | term = November 2023–present
 | honours = Senior Software Developer, Tech Lead, Python-Expert
-| website = {{URL|https://www.ashutoshverma.com}}
+| website = {{URL|https://ashutoshverma.com}}
 }}
 
 == Ashutosh Verma - Professional Overview ==
-Ashutosh Verma is an accomplished software development engineer (SDE-3) with over six years of extensive experience in full-stack development. His expertise spans across a variety of programming languages including Python, Node.js, Java, JavaScript, and more. Proficient in modern frameworks and libraries such as React, Next.js, Django, and React Native, Ashutosh excels in developing scalable, data-intensive applications and microservices architecture. <ref>https://www.ashutoshverma.com/cv/</ref>
+Ashutosh Verma is an accomplished software development engineer (SDE-3) with over six years of extensive experience in full-stack development. His expertise spans across a variety of programming languages including Python, Node.js, Java, JavaScript, and more. Proficient in modern frameworks and libraries such as React, Next.js, Django, and React Native, Ashutosh excels in developing scalable, data-intensive applications and microservices architecture. <ref>https://ashutoshverma.com/cv/</ref>
 
-His career highlights include leading significant projects at Shyftlabs and ORNAZ, where he implemented CI/CD workflows, achieved high test coverage, and enhanced user experience through optimized performance and SEO-focused solutions. Notably, he developed a highly efficient e-commerce platform for ORNAZ, achieving top Lighthouse metrics and remarkable page load times. Ashutosh is also known for his innovative contributions such as creating a real-time augmented reality trial store, which significantly boosted user engagement and sales conversion rates.<ref>https://www.ashutoshverma.com</ref>
+His career highlights include leading significant projects at Shyftlabs and ORNAZ, where he implemented CI/CD workflows, achieved high test coverage, and enhanced user experience through optimized performance and SEO-focused solutions. Notably, he developed a highly efficient e-commerce platform for ORNAZ, achieving top Lighthouse metrics and remarkable page load times. Ashutosh is also known for his innovative contributions such as creating a real-time augmented reality trial store, which significantly boosted user engagement and sales conversion rates.<ref>https://ashutoshverma.com</ref>
 
 With a strong foundation in technical skills, Ashutosh continues to drive business success through agile development practices, ensuring high-quality, efficient solutions. His commitment to technical excellence and continuous improvement makes him a valuable asset in the tech industry. 
 
-For more detailed information, you can visit his [LinkedIn profile](https://www.linkedin.com/in/ashutosh-verma-b90083106) or [personal website](https://www.ashutoshverma.com).
+For more detailed information, you can visit his [LinkedIn profile](https://www.linkedin.com/in/ashutosh-verma-b90083106) or [personal website](https://ashutoshverma.com).
 
-==Social Profiles <ref>https://www.ashutoshverma.com</ref>==
+==Social Profiles <ref>https://ashutoshverma.com</ref>==
 * [https://twitter.com/ashu_just_ashu Twitter]
 * [https://github.com/vKrypto Github]
 * [https://linkedin.com/in/ashutosh-verma-b90083106 LinkedIN]
 * [https://medium.com/@ashutosh.career19 Medium]
 * [https://github.com/vKrypto LeetCode]
-* [https://www.ashutoshverma.com ashutoshverma.com]
+* [https://ashutoshverma.com ashutoshverma.com]
 
-==Popular Posts <ref>https://www.ashutoshverma.com</ref>==
-* [https://www.ashutoshverma.com/lighthouse-score-breakdown Achieving 100/100 Lighthouse Metrics: A Technical Breakdown 🚀] <ref>https://www.ashutoshverma.com/lighthouse-score-breakdown</ref>
-* [https://www.ashutoshverma.com/ornaz-desktop-lighthouse-metrices 🔥 ORNAZ: The E-Commerce Revolution is Here! 💯⚡️ Say Goodbye to Slow Websites!]<ref>https://www.ashutoshverma.com/ornaz-desktop-lighthouse-metrices</ref>
+==Popular Posts <ref>https://ashutoshverma.com</ref>==
+* [https://ashutoshverma.com/lighthouse-score-breakdown Achieving 100/100 Lighthouse Metrics: A Technical Breakdown 🚀] <ref>https://ashutoshverma.com/lighthouse-score-breakdown</ref>
+* [https://ashutoshverma.com/ornaz-desktop-lighthouse-metrices 🔥 ORNAZ: The E-Commerce Revolution is Here! 💯⚡️ Say Goodbye to Slow Websites!]<ref>https://ashutoshverma.com/ornaz-desktop-lighthouse-metrices</ref>
 
 == Education ==
 '''Bachelor of Technology'''  
@@ -92,6 +92,6 @@ how a diamond looks along with different skins, diamond shape, size, settings.
 == Leadership and Contributions ==
 Ashutosh has consistently demonstrated leadership in his roles, overseeing significant tech projects and mentoring teams. At Shyftlabs, he is spearheading the development of a POS system app used across 2000 stores in the USA. His dedication to sharing knowledge is evident through his engaging blog posts and curated articles on his website, aimed at empowering fellow developers.
 
-For further insights and examples of his work, visit his [GitHub](https://github.com/vKrypto), visit his [LinkedIn](https://www.linkedin.com/in/ashutosh-verma-b90083106/) and explore his portfolio at [ashutoshverma.com](https://www.ashutoshverma.com).
+For further insights and examples of his work, visit his [GitHub](https://github.com/vKrypto), visit his [LinkedIn](https://www.linkedin.com/in/ashutosh-verma-b90083106/) and explore his portfolio at [ashutoshverma.com](https://ashutoshverma.com).
 
 == Refrences ==
