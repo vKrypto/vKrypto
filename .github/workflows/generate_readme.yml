@@ -1,0 +1,51 @@
+# Sample workflow for building and deploying a Jekyll site to GitHub Pages
+name: Generate Readme
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches:
+      - development
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+
+jobs:
+  generate-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Setup main repo
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git fetch origin main
+          git checkout main
+
+      - name: Generate README file
+        run: |
+            python -m pip install pyyaml
+            python -m pip install jinja2
+            python readme_generator/update_readme.py
+        
+        
+      - name: Adding Changes
+        run: |
+          git add README.md
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
