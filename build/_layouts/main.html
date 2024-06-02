@@ -6,12 +6,16 @@ layout: default
   <header>
     <div class="about">
       <div class="cover-author-image">
-        <a href="{{site.baseurl}}/"><img src="{{site.baseurl}}/assets/img/{% if site.author-img %}{{site.author-img}}{% endif %}" alt="{{site.author}}"></a>
+        <a href="{{site.baseurl}}/"><img src="{{site.url}}{{site.baseurl}}/assets/img/{% if site.author-img %}{{site.author-img}}{% endif %}" alt="{{site.author}}"></a>
       </div>
       <div class="author-name">{{site.author.name}}</div>
       <p>{{site.about-author}}</p>
       <p>
-        <a href="/cv" style="text-decoration: none;"> My Resume </a>
+        <a href="{{site.url}}/cv" style="text-decoration: none;"> My Resume </a>
+      </p>
+      <hr/>
+      <p>
+        <a href="{{site.url}}/blog/" style="text-decoration: none;"> My Blogs </a>
       </p>
       <hr/>
       <p>
@@ -55,7 +59,7 @@ layout: default
         {% if site.social-leetcode %}
           <li class="leetcode" style="width:30px;"><a href="https://leetcode.com/u/{{site.social-leetcode}}" target="_blank" style="padding:0">
             <i class="fa fa-leetcode">
-              <img src="{{site.baseurl}}/assets/images/leetcode.png" alt="leetcode-icon" height="30px", width="30px">
+              <img src="{{site.url}}{{site.baseurl}}/assets/images/leetcode.png" alt="leetcode-icon" height="30px", width="30px">
             </i>
           </a></li>
         {% endif %}
