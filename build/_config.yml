@@ -13,7 +13,7 @@ author:
   url: "https://ashutoshverma.com"
   logo: https://ashutoshverma.com/assets/img/profile_small.webp
 
-author-img: profile.jpeg # add your photo
+author-img: profile_small.webp # add your photo
 about-author: > 
   Experienced Senior Software Developer with a proven track record of over 6 years in full-stack development. 
   Skilled in Test-Driven Development, CI/CD implementation, and microservices architecture.
