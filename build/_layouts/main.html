@@ -42,29 +42,30 @@ layout: default
       <h3 class="contact-title">Contact me</h3>
       <ul>
         {% if site.social-twitter %}
-          <li><a href="https://twitter.com/{{ site.social-twitter }}" target="_blank"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+          <li><a href="https://twitter.com/{{ site.social-twitter }}" title="Twitter Profile" target="_blank"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
         {% endif %}
         {% if site.social-facebook %}
-          <li><a href="https://facebook.com/{{ site.social-facebook }}" target="_blank"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+          <li><a href="https://facebook.com/{{ site.social-facebook }}" title="FaceBook" target="_blank"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
         {% endif %}
         {% if site.social-github %}
-          <li class="github"><a href="http://github.com/{{site.social-github}}" target="_blank"><i class="fa fa-github"></i></a></li>
+          <li class="github"><a href="http://github.com/{{site.social-github}}" title="Github Profile" target="_blank"><i class="fa fa-github"></i></a></li>
         {% endif %}
         {% if site.social-linkedin %}
-          <li class="linkedin"><a href="https://linkedin.com/in/{{site.social-linkedin}}" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+          <li class="linkedin"><a href="https://linkedin.com/in/{{site.social-linkedin}}" title="LinkedIn Profile" target="_blank"><i class="fa fa-linkedin"></i></a></li>
         {% endif %}
         {% if site.social-medium-url %}
-          <li class="medium"><a href="{{site.social-medium-url}}" target="_blank"><i class="fa fa-medium"></i></a></li>
+          <li class="medium"><a href="{{site.social-medium-url}}" title="Medium Profile" target="_blank"><i class="fa fa-medium"></i></a></li>
         {% endif %}
         {% if site.social-leetcode %}
-          <li class="leetcode" style="width:30px;"><a href="https://leetcode.com/u/{{site.social-leetcode}}" target="_blank" style="padding:0">
+          <li class="leetcode" style="width:30px;">
+            <a href="https://leetcode.com/u/{{site.social-leetcode}}" title="LeetCode Profile" target="_blank" style="padding:0">
             <i class="fa fa-leetcode">
               <img src="{{site.url}}{{site.baseurl}}/assets/images/leetcode.png" alt="leetcode-icon" height="30px", width="30px">
             </i>
           </a></li>
         {% endif %}
         {% if site.social-email %}
-          <li class="email"><a href="mailto:{{site.social-email}}"><i class="fa fa-envelope-o"></i></a></li>
+          <li class="email"><a href="mailto:{{site.social-email}}" title="Email"><i class="fa fa-envelope-o"></i></a></li>
         {% endif %}
       </ul>
     </section> <!-- End Section Contact -->
