@@ -11,7 +11,7 @@ site-twitter: ashu_just_ashu #if your site has a twitter account, enter it here
 author:
   name: Ashutosh Verma
   url: "https://ashutoshverma.com"
-  logo: https://ashutoshverma.com/assets/img/profile.jpeg
+  logo: https://ashutoshverma.com/assets/img/profile_small.webp
 
 author-img: profile.jpeg # add your photo
 about-author: > 
