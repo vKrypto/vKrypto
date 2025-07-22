@@ -6,26 +6,8 @@ Ever wondered why your bank account doesn't randomly fluctuate when you're makin
 
 ## 🧪 Quick Isolation Refresher
 
-Isolation ensures simultaneous transactions don't interfere with each other, maintaining database consistency and correctness.
+Isolation ensures simultaneous transactions don't interfere with each other, maintaining database consistency and correctness. common problems like dirty-read, phantom-read and non-repeatable reads can accurs while running consurrent transactions. 
 
-## 🔄 PCC vs. OCC: The Concurrency Face-off!
-
-### 🛡️ Pessimistic Concurrency Control (PCC)
-Think of PCC as the strict librarian who says, "Shhh! No one else can read this book till I'm done!" Typically matches **Serializable & Repeatable Read**.
-
-### 😎 Optimistic Concurrency Control (OCC)
-OCC is your chill friend: "It's fine, read whatever—but we'll sort out conflicts at the end!" Typically matches **Read Committed**.
-
-PostgreSQL prefers OCC, MongoDB recently adopted OCC, while SQL databases favor PCC.
-
-## 🛠️ Isolation Levels Explained (with Emojis!)
-
-| Isolation Level     | Dirty Read 🤢 | Non-Repeatable Read 🔄 | Phantom Read 👻 | Consistency 📌 |
-|---------------------|---------------|------------------------|-----------------|----------------|
-| Read Uncommitted 📖 | ✅            | ✅                    | ✅              | Low 📉         |
-| Read Committed 📚   | ❌            | ✅                    | ✅              | Medium 📈      |
-| Repeatable Read 🔒  | ❌            | ❌                    | ✅              | High 📊        |
-| Serializable 🗝️    | ❌            | ❌                    | ❌              | Highest 🚀     |
 
 ### 🧹 Dirty Read Explained
 **Problem:** Imagine borrowing notes from a friend who later decides they were all wrong! That's what dirty reads feel like—Transaction A reads data from Transaction B before it's committed. If B rolls back, A is left with invalid data.
@@ -42,13 +24,37 @@ PostgreSQL prefers OCC, MongoDB recently adopted OCC, while SQL databases favor 
 
 **Solution:** Use "Serializable" isolation, which locks the range of rows, preventing spooky surprises and ensuring repeatable query results every time.
 
+
+## 🛠️ Isolation Levels Explained 
+
+| Isolation Level     | Dirty Read 🤢 | Non-Repeatable Read 🔄 | Phantom Read 👻 | Consistency 📌 |
+|---------------------|---------------|------------------------|-----------------|----------------|
+| Read Uncommitted 📖 | ✅            | ✅                    | ✅              | Low 📉         |
+| Read Committed 📚   | ❌            | ✅                    | ✅              | Medium 📈      |
+| Repeatable Read 🔒  | ❌            | ❌                    | ✅              | High 📊        |
+| Serializable 🗝️    | ❌            | ❌                    | ❌              | Highest 🚀     |
+
+
 ### 🔐 Locking Strategies Per Isolation Level
 | Level               | Read Lock 🔍                     | Write Lock 📝                      |
 |---------------------|----------------------------------|-----------------------------------|
 | Read Uncommitted 📖 | ❌ No lock                         | ❌ No lock                         |
 | Read Committed 📚   | ✅ Shared (short-lived)            | ✅ Exclusive (till transaction end) |
 | Repeatable Read 🔒  | ✅ Shared (till transaction end)   | ✅ Exclusive (till transaction end) |
-| Serializable 🗝️    | Shared + Range Lock 🚧             | Exclusive till end 🏁             |
+| Serializable 🗝️    | Shared + Range Lock 🚧             | ✅ Exclusive (till transaction end)  |
+
+------
+
+
+## 🔄 PCC vs. OCC: The Concurrency Face-off!
+
+### 🛡️ Pessimistic Concurrency Control (PCC)
+Think of PCC as the strict librarian who says, "Shhh! No one else can read this book till I'm done!" Typically matches **Serializable & Repeatable Read**.
+
+### 😎 Optimistic Concurrency Control (OCC)
+OCC is your chill friend: "It's fine, read whatever—but we'll sort out conflicts at the end!" Typically matches **Read Committed**.
+
+PostgreSQL prefers OCC, MongoDB recently adopted OCC, while SQL databases favor PCC.
 
 ## ⚖️ Cross-Database Quick Comparison
 
@@ -64,7 +70,7 @@ PostgreSQL prefers OCC, MongoDB recently adopted OCC, while SQL databases favor 
 - MongoDB: Limit multi-doc txns, use snapshot isolation for consistency.
 - SQL DBs: Adjust isolation settings for transactional efficiency—balance locking overhead with consistency needs.
 
-## 🌎 Real-Life Scenarios (with Humor!)
+## 🌎 Real-Life Scenarios
 - **Finance 🏦:** Serializable isolation ensures your balance doesn't magically vanish.
 - **E-commerce 🛒:** Snapshot isolation stops phantom items appearing in carts.
 - **Inventory 📦:** Repeatable Read ensures your stock numbers don't randomly change mid-transaction.
