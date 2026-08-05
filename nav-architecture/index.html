@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NAV Back-Office Balance Pipeline — Architecture Walkthrough</title>
+<style>
+  :root {
+    --bg: #F7F5EF;
+    --surface: #FFFFFF;
+    --surface-sunk: #EFEAE0;
+    --text: #1B1F27;
+    --text-dim: #6B6355;
+    --border: #E4DFD1;
+    --border-strong: #CFC9B8;
+    --accent: #B85C1E;      /* copper — sync / control-plane paths */
+    --accent-2: #0AA398;    /* teal — async / event-driven paths */
+    --ok: #2E7D4F;
+    --err: #B23B3B;
+    --info: #3B6FA6;
+    --code-bg: #EFEAE0;
+    --shadow: 0 1px 2px rgba(27,31,39,0.05), 0 8px 24px rgba(27,31,39,0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171D;
+      --surface: #1B1F27;
+      --surface-sunk: #1F242D;
+      --text: #ECE9E1;
+      --text-dim: #9A9384;
+      --border: #2A2F3A;
+      --border-strong: #3A4150;
+      --accent: #C86A34;
+      --accent-2: #17998C;
+      --ok: #4CAF77;
+      --err: #E06060;
+      --info: #6E9FD1;
+      --code-bg: #1F242D;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171D; --surface: #1B1F27; --surface-sunk: #1F242D;
+    --text: #ECE9E1; --text-dim: #9A9384; --border: #2A2F3A; --border-strong: #3A4150;
+    --accent: #C86A34; --accent-2: #17998C; --ok: #4CAF77; --err: #E06060; --info: #6E9FD1;
+    --code-bg: #1F242D; --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #F7F5EF; --surface: #FFFFFF; --surface-sunk: #EFEAE0;
+    --text: #1B1F27; --text-dim: #6B6355; --border: #E4DFD1; --border-strong: #CFC9B8;
+    --accent: #B85C1E; --accent-2: #0AA398; --ok: #2E7D4F; --err: #B23B3B; --info: #3B6FA6;
+    --code-bg: #EFEAE0; --shadow: 0 1px 2px rgba(27,31,39,0.05), 0 8px 24px rgba(27,31,39,0.05);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+  a { color: var(--accent); }
+  h1, h2, h3, h4 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-weight: 600;
+    text-wrap: balance;
+    color: var(--text);
+    margin: 0 0 0.5em;
+  }
+  code, .mono, table, .stat-num, .lat-label, .badge, .toc, .fig-tag {
+    font-variant-numeric: tabular-nums;
+  }
+  pre, code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ---- masthead ---- */
+  .masthead {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 3.2rem 2rem 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .masthead-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .theme-toggle {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    padding: 0;
+    box-shadow: var(--shadow);
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .theme-toggle:hover { border-color: var(--accent); }
+  .theme-toggle:active { transform: scale(0.92); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .theme-toggle svg { width: 17px; height: 17px; display: block; }
+  .theme-toggle .icon-moon { display: none; }
+  :root[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+  :root[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+  @media (prefers-color-scheme: dark) {
+    .theme-toggle .icon-sun { display: none; }
+    .theme-toggle .icon-moon { display: block; }
+  }
+  :root[data-theme="light"] .theme-toggle .icon-sun { display: block; }
+  :root[data-theme="light"] .theme-toggle .icon-moon { display: none; }
+  .masthead h1 { font-size: clamp(1.7rem, 3vw, 2.5rem); margin-top: 0.4rem; max-width: 18ch; }
+  .masthead .sub { color: var(--text-dim); max-width: 62ch; font-size: 1.05rem; margin-top: 0.6rem; }
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    margin-top: 1.4rem;
+  }
+  .tag {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.28rem 0.6rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    color: var(--text-dim);
+    background: var(--surface);
+  }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 1px;
+    margin-top: 1.8rem;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .stat {
+    background: var(--surface);
+    padding: 1rem 1.1rem;
+  }
+  .stat-num {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1.5rem; font-weight: 600; color: var(--text);
+  }
+  .stat-label { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+  /* ---- layout ---- */
+  .layout {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 220px minmax(0,1fr);
+    gap: 2.5rem;
+    padding: 2.5rem 2rem 6rem;
+    align-items: start;
+  }
+  nav.toc {
+    position: sticky; top: 2rem;
+    font-size: 0.86rem;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+  nav.toc .part-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin: 1.1rem 0 0.4rem;
+  }
+  nav.toc .part-label:first-child { margin-top: 0; }
+  nav.toc a {
+    display: block;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 0.22rem 0;
+    border-left: 2px solid transparent;
+    padding-left: 0.7rem;
+    margin-left: -0.7rem;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav.toc a:hover { color: var(--text); border-color: var(--border-strong); }
+
+  main { min-width: 0; }
+  section { margin-bottom: 3.2rem; scroll-margin-top: 1.5rem; }
+  section > h2 {
+    font-size: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.1rem;
+  }
+  section > h2 .num { color: var(--text-dim); font-weight: 400; margin-right: 0.4em; }
+  h3 { font-size: 1.12rem; margin-top: 1.8rem; }
+  h3 .num { color: var(--text-dim); font-weight: 400; }
+  p { max-width: 72ch; }
+  ul, ol { max-width: 70ch; padding-left: 1.3rem; }
+  li { margin-bottom: 0.3rem; }
+  strong { color: var(--text); }
+
+  .part-divider {
+    display: flex; align-items: center; gap: 1rem;
+    margin: 3.5rem 0 2rem;
+  }
+  .part-divider .line { flex: 1; height: 1px; background: var(--border-strong); }
+  .part-divider .part-title {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.4rem;
+    margin: 1.2rem 0;
+    box-shadow: var(--shadow);
+  }
+  .fig-tag {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 0.8rem; display: block;
+  }
+  .panel .overflow { overflow-x: auto; }
+  .panel pre.mermaid { margin: 0; }
+
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    padding: 0.9rem 1.1rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1.2rem 0;
+    max-width: 70ch;
+  }
+  .callout.teal { border-color: var(--accent-2); }
+  .callout p { margin: 0; }
+  .callout .label { font-weight: 600; display: block; margin-bottom: 0.25rem; }
+
+  table {
+    width: 100%; border-collapse: collapse; font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left; padding: 0.55rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--text-dim); font-weight: 600;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .overflow-table { overflow-x: auto; }
+
+  code.field {
+    background: var(--code-bg);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.88em;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 0.35em;
+    font-size: 0.74rem; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    padding: 0.15rem 0.55rem; border-radius: 99px; border: 1px solid var(--border-strong);
+  }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+  .badge.ready::before { background: var(--text-dim); }
+  .badge.running::before { background: var(--info); }
+  .badge.completed::before { background: var(--ok); }
+  .badge.failed::before { background: var(--err); }
+  .badge.ready { color: var(--text-dim); }
+  .badge.running { color: var(--info); border-color: var(--info); }
+  .badge.completed { color: var(--ok); border-color: var(--ok); }
+  .badge.failed { color: var(--err); border-color: var(--err); }
+
+  .swatch { display: inline-flex; align-items: center; gap: 0.4em; font-size: 0.85rem; color: var(--text-dim); }
+  .swatch .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  details.qa {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.7rem 1rem; margin-bottom: 0.7rem;
+  }
+  details.qa summary { cursor: pointer; font-weight: 600; }
+  details.qa[open] summary { margin-bottom: 0.5rem; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.toc {
+      position: static; max-height: none; overflow: visible;
+      display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 1rem;
+      border-bottom: 1px solid var(--border); padding-bottom: 0.8rem;
+    }
+    nav.toc .part-label { display: none; }
+    nav.toc a { border-left: none; padding-left: 0; margin-left: 0; white-space: nowrap; border-bottom: 2px solid transparent; }
+    .stat-row { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-top">
+    <span class="eyebrow">System Architecture Walkthrough</span>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle light / dark mode">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+  </div>
+  <h1>NAV Back-Office Balance Pipeline</h1>
+  <p class="sub">A job-scheduling and balance-ingestion platform that pulls account balances from 500+ crypto exchanges, blockchains, and equity funds on fixed daily cut-offs — engineered around the fact that most clients want the same cut-off: <strong>UTC 00:00</strong>.</p>
+  <div class="meta-row">
+    <span class="tag">BASIC + IN-DEPTH</span>
+    <span class="tag">KAFKA</span>
+    <span class="tag">gRPC</span>
+    <span class="tag">REDIS</span>
+    <span class="tag">S3 / RABBITMQ</span>
+    <span class="tag">.NET · GO · PYTHON</span>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-num">500+</div><div class="stat-label">exchanges, chains &amp; funds covered</div></div>
+    <div class="stat"><div class="stat-num">15,000</div><div class="stat-label">clients</div></div>
+    <div class="stat"><div class="stat-num">66,000</div><div class="stat-label">accounts under management</div></div>
+    <div class="stat"><div class="stat-num">20,000+</div><div class="stat-label">accounts requesting the UTC 00:00 cut-off</div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="toc">
+    <div class="part-label">Orientation</div>
+    <a href="#brief-answers">Answering the brief</a>
+    <a href="#core-problem">The core problem</a>
+
+    <div class="part-label">Part I — Basic</div>
+    <a href="#basic-diagram">Basic architecture</a>
+    <a href="#basic-components">Component summary</a>
+
+    <div class="part-label">Part II — In-depth</div>
+    <a href="#indepth-diagram">Detailed diagram</a>
+    <a href="#job-store">Job store</a>
+    <a href="#task-status-api">Task status API</a>
+    <a href="#scheduler">Scheduler</a>
+    <a href="#kafka">Kafka &amp; event flow</a>
+    <a href="#consumer">Consumer</a>
+    <a href="#account-api">Account API</a>
+    <a href="#datafetch">Datafetch service</a>
+    <a href="#caching">Caching strategy</a>
+    <a href="#data-processor">Data processor &amp; DB</a>
+    <a href="#lifecycle">End-to-end lifecycle</a>
+    <a href="#db-design">Database design</a>
+    <a href="#integration">Integration patterns</a>
+    <a href="#reliability">Reliability &amp; failure handling</a>
+    <a href="#scale">Performance &amp; scale</a>
+
+    <div class="part-label">Close</div>
+    <a href="#assumptions">Confirmed decisions</a>
+  </nav>
+
+  <main>
+
+    <section id="brief-answers">
+      <h2>Answering the brief</h2>
+      <p>Every aspect asked for in the original brief, answered in one line with a link to the full treatment:</p>
+      <div class="overflow-table">
+        <table>
+          <tr><th>Requested aspect</th><th>Short answer</th></tr>
+          <tr><td>Overall system architecture diagram</td><td>Two levels — <a href="#basic-diagram">basic flow (Fig. 02)</a> for a CTO read, full <a href="#indepth-diagram">component map (Fig. 03)</a> for an architect read.</td></tr>
+          <tr><td>Microservices and their interactions</td><td>Nine services, each broken down in <a href="#job-store">§2.1–2.9</a>, wired together in <a href="#indepth-diagram">Fig. 03</a>.</td></tr>
+          <tr><td>Kafka (message broker) and event-driven communication</td><td>Partitions, ordering, and how it differs from the RabbitMQ leg — <a href="#kafka">§2.4</a>.</td></tr>
+          <tr><td>Database design and data flow</td><td>Job store schema — <a href="#job-store">§2.1</a>; job store vs. reporting DB and how data moves — <a href="#db-design">§4</a>.</td></tr>
+          <tr><td>Caching layer and caching strategy</td><td>Two separate caches — credentials and market data — <a href="#caching">§2.8</a> (Fig. 04).</td></tr>
+          <tr><td>Integration between services and supporting components</td><td>Every hop, sync vs. async, protocol and why — <a href="#integration">§5</a>.</td></tr>
+          <tr><td>Architecture diagram illustrating the complete solution</td><td>End to end — <a href="#indepth-diagram">component map (Fig. 03)</a> + <a href="#lifecycle">single-job sequence (Fig. 05, §3)</a>.</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="core-problem">
+      <h2><span class="num">§0</span>The core problem</h2>
+      <p>Exchanges don't expose historical balance. If we don't capture a balance at the moment a client's accounting period closes, that number is gone forever — so balance capture is not a "nice to have" poll, it's the only ledger entry that will ever exist for that slot. Clients pick their own cut-off (once or twice daily), but when <strong>20,000+ of 66,000 accounts</strong> independently pick the same natural boundary — midnight UTC — the system inherits one enormous synchronized burst instead of a smooth trickle.</p>
+      <p>The architecture below isn't designed to average that burst away. It's designed to <strong>absorb it</strong>: every control-plane hop is sub-second, and the one stage that talks to the outside world (Datafetch) is scaled horizontally wide enough that 20,000 concurrent jobs still land inside a single-digit-second window. §<a href="#scale">Performance &amp; scale</a> shows exactly where that time budget goes.</p>
+
+      <div class="panel">
+        <span class="fig-tag">Fig. 01 — where the 00:00 UTC burst spends its time</span>
+        <div class="overflow">
+          <svg viewBox="0 0 600 230" role="img" aria-labelledby="latdesc" style="width:100%; height:auto; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;">
+            <title id="latdesc">Cumulative latency from schedule tick to stage completion, log scale from 100ms to 10s</title>
+            <!-- gridlines -->
+            <g stroke="var(--border)" stroke-width="1">
+              <line x1="20" y1="26" x2="20" y2="196" stroke-dasharray="2,3"/>
+              <line x1="300" y1="26" x2="300" y2="196" stroke-dasharray="2,3"/>
+              <line x1="580" y1="26" x2="580" y2="196" stroke-dasharray="2,3"/>
+            </g>
+            <line x1="20" y1="196" x2="580" y2="196" stroke="var(--border-strong)" stroke-width="1"/>
+            <text x="20" y="214" fill="var(--text-dim)" font-size="11">100 ms</text>
+            <text x="300" y="214" fill="var(--text-dim)" font-size="11" text-anchor="middle">1 s</text>
+            <text x="580" y="214" fill="var(--text-dim)" font-size="11" text-anchor="end">10 s</text>
+
+            <!-- row 1: scheduler -->
+            <text x="20" y="46" fill="var(--text)" font-size="12">Scheduler sweep → Kafka publish</text>
+            <line x1="69" y1="62" x2="104" y2="62" stroke="var(--accent)" stroke-width="14" stroke-linecap="round"/>
+            <text x="114" y="66" fill="var(--text)" font-size="12">150–200 ms</text>
+
+            <!-- row 2: consumer -->
+            <text x="20" y="106" fill="var(--text)" font-size="12">Consumer dispatch (Kafka → gRPC)</text>
+            <line x1="238" y1="122" x2="257" y2="122" stroke="var(--accent)" stroke-width="14" stroke-linecap="round"/>
+            <text x="267" y="126" fill="var(--text)" font-size="12">600–700 ms</text>
+
+            <!-- row 3: datafetch -->
+            <text x="20" y="166" fill="var(--text)" font-size="12">Datafetch execution complete</text>
+            <line x1="537" y1="182" x2="553" y2="182" stroke="var(--accent)" stroke-width="14" stroke-linecap="round"/>
+            <text x="563" y="186" fill="var(--text)" font-size="12" text-anchor="end" transform="translate(60,0)">7–8 s</text>
+          </svg>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-dim); max-width:70ch; margin-top:0.6rem; margin-bottom:0;">Log scale, x-axis is cumulative time since the schedule tick. Each bar spans the reported min–max completion time for 20,000 concurrent jobs. Data processor time isn't shown — it drains the RabbitMQ queue asynchronously and isn't part of the client-facing SLA.</p>
+      </div>
+
+      <div class="callout">
+        <span class="label">Why this works</span>
+        <p>Everything before Datafetch (job store → scheduler → Kafka → consumer) is internal bookkeeping and finishes in under a second even at 20k concurrency. The actual network I/O — 20,000 simultaneous round-trips to 500+ third-party exchanges — is pushed onto <strong>280 Datafetch pods</strong> running concurrently, which is what keeps the external burst inside a 7–8 second envelope instead of a multi-minute queue drain.</p>
+      </div>
+    </section>
+
+    <div class="part-divider"><span class="part-title">Part I</span><div class="line"></div><span class="part-title">Basic Architecture</span></div>
+
+    <section id="basic-diagram">
+      <h2><span class="num">§1</span>Basic architecture</h2>
+      <p>At the highest level this is a five-stage pipeline: a scheduled job is born in a database, handed to a message broker, executed against an external API, and the result is written back through a second, decoupled pipeline into a reporting table.</p>
+      <div class="panel">
+        <span class="fig-tag">Fig. 02 — basic data flow</span>
+        <div class="overflow">
+<pre class="mermaid">
+flowchart LR
+    CL["Clients<br/>15k clients · 66k accounts"] --> JS[("Job Store")]
+    JS --> SCH["Scheduler"]
+    SCH -->|every minute| K[["Kafka"]]
+    K --> CO["Consumer"]
+    CO --> DF["Datafetch Service"]
+    DF <--> EXC[("500+ venues:<br/>exchanges · chains · funds")]
+    DF --> S3[("S3<br/>raw balances")]
+    DF --> RMQ[["RabbitMQ"]]
+    RMQ --> DP["Data Processor"]
+    DP --> RDB[("Reporting DB")]
+    CO -.status.-> TS["Task Status API"]
+    TS -.flush.-> JS
+</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="basic-components">
+      <h3><span class="num">1.1</span>What each stage does</h3>
+      <ul>
+        <li><strong>Job Store</strong> — the source of truth: which account needs a balance pulled, from where, and when.</li>
+        <li><strong>Scheduler</strong> — wakes up every minute, finds due jobs, pushes them onto Kafka in bulk.</li>
+        <li><strong>Kafka</strong> — the buffer that lets 20,000 jobs appear at once without anything falling over.</li>
+        <li><strong>Consumer</strong> — drains Kafka and fans each job out to the Datafetch service.</li>
+        <li><strong>Datafetch Service</strong> — does the actual work: talks to the exchange/chain/fund, gets a balance.</li>
+        <li><strong>S3 + RabbitMQ</strong> — the raw result is parked in object storage and a "come process this" message is dropped on a second queue.</li>
+        <li><strong>Data Processor</strong> — turns the raw payload into the final row a client's accountant actually reads.</li>
+        <li><strong>Task Status API</strong> — the live "is it done yet" layer sitting alongside all of this.</li>
+      </ul>
+      <p>That's the whole story for a CTO-level read. Part II below unpacks every one of these into the actual technology, schema, and failure-handling behind it.</p>
+    </section>
+
+    <div class="part-divider"><span class="part-title">Part II</span><div class="line"></div><span class="part-title">In-Depth Architecture</span></div>
+
+    <section id="indepth-diagram">
+      <h2><span class="num">§2</span>Detailed architecture</h2>
+      <div class="panel">
+        <span class="fig-tag">Fig. 03 — full component &amp; interaction map</span>
+        <div class="overflow">
+<pre class="mermaid">
+flowchart TB
+    subgraph CP["Control Plane"]
+        JS[("Job Store (SQL)<br/>task_type · user_id · account_id<br/>last_id · last_run_status · retry_count")]
+        SCH["Scheduler (.NET)<br/>1×/min sweep of SQL views"]
+        TS["Task Status API (.NET)<br/>in-memory status · 10s flush · 3h expiry<br/>dedupes repeat requests"]
+    end
+
+    subgraph EB["Event Backbone"]
+        K[["Kafka<br/>30 partitions · 3 nodes<br/>ordered bulk publish"]]
+    end
+
+    subgraph EP["Execution Plane"]
+        CO["Consumer (.NET)<br/>concurrent gRPC, multiplexed"]
+        DF["Datafetch Service (Python)<br/>280 k8s pods / 5 bare-metal nodes"]
+        AA["Account API (Go)<br/>region + proxy routing"]
+        VAULT[("Vault")]
+    end
+
+    subgraph CC["Market-Data Cache Chain"]
+        M1["In-memory"]
+        M2["File-based"]
+        M3["Redis"]
+        EXC[("500+ venues")]
+    end
+
+    subgraph IP["Ingest Pipeline"]
+        S3[("AWS S3<br/>raw balance payloads")]
+        RMQ[["AWS RabbitMQ"]]
+        DP["Data Processor (Python)"]
+        RDB[("Reporting DB")]
+        DLQ[["Dead Letter Queue"]]
+    end
+
+    JS --> SCH
+    SCH -->|ordered bulk publish| K
+    SCH -.bulk status: ready.-> TS
+    K --> CO
+    CO -.status: running.-> TS
+    CO -->|gRPC, concurrent| DF
+    DF -->|gRPC: get creds/config/proxy| AA
+    AA --> VAULT
+    DF --> M1 --> M2 --> M3 --> EXC
+    DF -->|main-account batch| S3
+    DF -->|main-account msg| RMQ
+    DF -->|sub-account batch| S3
+    DF -->|sub-account msg| RMQ
+    DF -->|success or fail, t+7-8s| CO
+    CO -.completed / failed, retry×3.-> TS
+    TS -.flush every 10s.-> JS
+    RMQ --> DP
+    DP -->|fetch payload| S3
+    DP --> RDB
+    DP -.fail×3.-> DLQ
+</pre>
+        </div>
+      </div>
+      <p style="font-size:0.9rem; color:var(--text-dim);">Note the direction of the middle hop: it's <strong>Datafetch that calls Account API</strong> for credentials and proxy config — not the Consumer. The Consumer only ever talks to Datafetch. Both of these hops (Consumer→Datafetch and Datafetch→Account API) run over <strong>gRPC</strong>, for the same multiplexing reason.</p>
+    </section>
+
+    <section id="job-store">
+      <h3><span class="num">2.1</span>Job store</h3>
+      <p>A plain SQL database — the only stateful thing the rest of the system treats as ground truth. One row per scheduled task:</p>
+      <div class="panel">
+        <span class="fig-tag">Schema — job_store</span>
+        <div class="overflow-table">
+          <table>
+            <tr><th>Field</th><th>Purpose</th></tr>
+            <tr><td><code class="field">task_type</code></td><td>which kind of pull (main-account, sub-account, etc.)</td></tr>
+            <tr><td><code class="field">user_id / account_id</code></td><td>whose balance this is</td></tr>
+            <tr><td><code class="field">last_id</code></td><td>cursor into the source system for incremental pulls</td></tr>
+            <tr><td><code class="field">last_run_status</code></td><td>outcome of the previous attempt</td></tr>
+            <tr><td><code class="field">retry_count</code></td><td>how many times this job has been retried</td></tr>
+            <tr><td><code class="field">created_at / updated_at</code></td><td>audit trail</td></tr>
+          </table>
+        </div>
+      </div>
+      <p>The Scheduler never queries this table directly at read time — it reads through <a href="#db-design">SQL views</a> that pre-filter to "due right now," keeping the per-tick scan cheap even as the table grows.</p>
+    </section>
+
+    <section id="task-status-api">
+      <h3><span class="num">2.2</span>Task status API</h3>
+      <p>A .NET service that exists because writing a status update to SQL for every one of 20,000 jobs, on every state transition, would hammer the job store. Instead:</p>
+      <ul>
+        <li>Status (<span class="badge ready">ready</span> <span class="badge running">running</span> <span class="badge completed">completed</span> <span class="badge failed">failed</span>) lives in memory first.</li>
+        <li>Flushed back to the job store every <strong>10 seconds</strong>, batched.</li>
+        <li>De-duplicates repeat status requests for the same job — Kafka and retries can both re-signal the same job, and this layer collapses that noise.</li>
+        <li>Enforces a <strong>3-hour expiry</strong> per job, so a job that never reports back doesn't sit "running" forever and block the account it belongs to.</li>
+      </ul>
+    </section>
+
+    <section id="scheduler">
+      <h3><span class="num">2.3</span>Scheduler</h3>
+      <p>A .NET service on a one-minute tick. Each tick:</p>
+      <ol>
+        <li>Reads the "due now" SQL view.</li>
+        <li>Publishes the batch to Kafka as a bulk, <strong>ordered</strong> action — ordering matters because retries and cursor-based pulls (<code class="field">last_id</code>) need to land in sequence per account.</li>
+        <li>Bulk-publishes a <span class="badge ready">ready</span> status for the whole batch to the Task Status API.</li>
+      </ol>
+      <p>Measured completion time for a full 20,000-job tick: <strong>t + 150–200 ms</strong>.</p>
+    </section>
+
+    <section id="kafka">
+      <h3><span class="num">2.4</span>Kafka &amp; event-driven communication</h3>
+      <p>Kafka is the shock absorber between "20,000 jobs became due in the same minute" and "servers process work at a sane, even rate." Configuration: <strong>30 partitions</strong>, <strong>3 nodes</strong> for replication and failover. Two things matter about how it's used here:</p>
+      <ul>
+        <li><strong>Ordering</strong> — the scheduler publishes in bulk but preserves order, so downstream retry logic and cursor-based (<code class="field">last_id</code>) pulls stay deterministic per account.</li>
+        <li><strong>Partition count vs. consumer parallelism</strong> — 30 partitions is the ceiling on how many consumer instances can read in parallel before any of them sit idle; it was sized to the observed 20k-concurrent burst, not to steady-state volume.</li>
+      </ul>
+      <p>Note there's a <strong>second</strong>, purpose-different broker in this system: <strong>AWS RabbitMQ</strong>, downstream of Datafetch, decoupling "balance was fetched" from "balance was processed into a reportable row." Kafka governs job dispatch; RabbitMQ governs post-fetch processing. They're not interchangeable in this design — Kafka needs the partition/ordering guarantees for job fan-out, RabbitMQ is a simpler work queue for the processing step.</p>
+    </section>
+
+    <section id="consumer">
+      <h3><span class="num">2.5</span>Consumer</h3>
+      <p>A .NET service that drains Kafka and dispatches each job concurrently to the Datafetch service over <strong>gRPC</strong>, chosen specifically for its multiplexing — many concurrent job dispatches share connections instead of opening one socket per job. On the way in it marks a job <span class="badge running">running</span>; on the way out, <span class="badge completed">completed</span> or <span class="badge failed">failed</span> (with up to <strong>3 retries</strong> on failure) — both reported to the Task Status API.</p>
+      <p>Measured cumulative completion time from the schedule tick: <strong>t + 600–700 ms</strong> for the full 20,000-job batch.</p>
+    </section>
+
+    <section id="account-api">
+      <h3><span class="num">2.6</span>Account API</h3>
+      <p>A Go service, called <em>by Datafetch</em> (not by the Consumer) once per job. Its job is routing and credentials, not fetching:</p>
+      <ul>
+        <li>Distributes the outbound request across the correct <strong>proxy</strong>, chosen by region and the client's own whitelisting/configuration.</li>
+        <li>Holds an <strong>in-memory cache</strong> of API credentials, itself sourced from <strong>Vault</strong> — so Vault isn't hit per-job, only per-cache-miss.</li>
+      </ul>
+      <p>Measured throughput: <strong>20,000 concurrent requests</strong> at <strong>p99 1 ms / p100 40 ms</strong> — the cheapest hop in the whole pipeline, by design, since every one of the 20k jobs passes through it.</p>
+    </section>
+
+    <section id="datafetch">
+      <h3><span class="num">2.7</span>Datafetch service</h3>
+      <p>The only stage that talks to the outside world, and the reason the rest of the system exists. Python, deployed as <strong>280 Kubernetes pods</strong> across <strong>5 on-premise bare-metal nodes</strong> (Hyper-V, 84 Xeon Platinum cores / 250 GB RAM per node). Per job:</p>
+      <ol>
+        <li>Calls <a href="#account-api">Account API</a> over gRPC for credentials, config/params, and proxy info.</li>
+        <li>Resolves market data through the <a href="#caching">four-tier cache chain</a> (in-memory → file → Redis → exchange), decompressing and validating expiry on a hit.</li>
+        <li>Builds a <code class="field">ccxt</code> client from the resolved credentials/config.</li>
+        <li>Fetches <strong>main-account balance</strong> across categories via concurrent <code class="field">aiohttp</code> requests (DNS caching, timeouts, connection pooling) → writes to S3 → publishes a RabbitMQ message.</li>
+        <li>Fetches <strong>sub-account balance</strong> in a second concurrent batch → writes to S3 → publishes a RabbitMQ message.</li>
+        <li>Returns success/failure to the Consumer.</li>
+      </ol>
+      <p>At the 20,000-job burst, main- and sub-account fetches across categories fan out to roughly <strong>500,000 individual outbound requests</strong> against exchanges, blockchains, and funds — this is the actual internet-facing load the 280-pod fleet exists to spread across. Every response is pushed straight to S3 as it comes back, so a job is never holding a large payload in memory waiting on the rest of the batch.</p>
+      <p>Measured completion time: <strong>t + 7–8 s</strong> for the full 20,000-job burst — this is the number that everything upstream exists to protect.</p>
+    </section>
+
+    <section id="caching">
+      <h3><span class="num">2.8</span>Caching strategy</h3>
+      <p>Two independent caches exist for two different reasons — don't conflate them:</p>
+      <div class="callout">
+        <span class="label">Account API — credential cache</span>
+        <p>In-memory only, backed by Vault on miss. Small, hot, security-sensitive — no fallback tiers needed because Vault itself is the durable source.</p>
+      </div>
+      <div class="callout teal">
+        <span class="label">Datafetch — market-data cache</span>
+        <p>A four-tier fallback chain, because market data (order books, symbol metadata, rates) is large, shared across many jobs, and safe to serve slightly stale within an expiry window.</p>
+      </div>
+      <div class="panel">
+        <span class="fig-tag">Fig. 04 — market-data cache fallback chain</span>
+        <div class="overflow">
+<pre class="mermaid">
+flowchart LR
+    REQ["Market data request"] --> M1{"In-memory hit?"}
+    M1 -- yes --> RET["Return data"]
+    M1 -- no --> M2{"File cache hit?"}
+    M2 -- yes --> DECOMP["Decompress +<br/>validate expiry"] --> RET
+    M2 -- no --> M3{"Redis hit?"}
+    M3 -- yes --> DECOMP
+    M3 -- no --> EXC["Fetch from exchange"] --> POP["Populate all 3 tiers"] --> RET
+</pre>
+        </div>
+      </div>
+      <p>Each tier is a strictly cheaper miss than the one below it — in-memory is free, file avoids a network hop, Redis avoids hitting a rate-limited third party. The exchange call only happens when all three local tiers miss, which is also the only path that repopulates them.</p>
+    </section>
+
+    <section id="data-processor">
+      <h3><span class="num">2.9</span>Data processor &amp; reporting DB</h3>
+      <p>A Python service consuming off RabbitMQ. For each message: fetch the corresponding raw object from S3, transform it into the client-facing balance row, write it to the reporting SQL database. On failure, retry up to <strong>3 times</strong>; if still failing, route to a <strong>dead-letter queue</strong> for manual intervention rather than silently dropping a balance that, per §0, can never be re-fetched.</p>
+    </section>
+
+    <section id="lifecycle">
+      <h2><span class="num">§3</span>End-to-end job lifecycle</h2>
+      <p>One job, start to finish, showing exactly who talks to whom and in what order:</p>
+      <div class="panel">
+        <span class="fig-tag">Fig. 05 — single job sequence</span>
+        <div class="overflow">
+<pre class="mermaid">
+sequenceDiagram
+    participant SCH as Scheduler
+    participant K as Kafka
+    participant CO as Consumer
+    participant TS as Task Status API
+    participant DF as Datafetch
+    participant AA as Account API
+    participant EXC as Exchange
+    participant S3 as S3
+    participant RMQ as RabbitMQ
+    participant DP as Data Processor
+    participant DB as Reporting DB
+
+    SCH->>K: publish job batch (ordered)
+    SCH->>TS: bulk status = ready
+    K->>CO: deliver job
+    CO->>TS: status = running
+    CO->>DF: gRPC dispatch
+    DF->>AA: gRPC get credentials + proxy
+    AA-->>DF: creds, config, proxy
+    DF->>EXC: fetch main + sub-account balance
+    DF->>S3: store raw payload (x2)
+    DF->>RMQ: publish process message (x2)
+    DF-->>CO: success (t+7-8s)
+    CO->>TS: status = completed
+    RMQ->>DP: consume message
+    DP->>S3: fetch raw payload
+    DP->>DB: write final balance row
+</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="db-design">
+      <h2><span class="num">§4</span>Database design &amp; data flow</h2>
+      <p>Two SQL surfaces, deliberately kept separate:</p>
+      <div class="overflow-table">
+        <table>
+          <tr><th>Store</th><th>Written by</th><th>Read by</th><th>Shape</th></tr>
+          <tr><td>Job Store</td><td>Task Status API (10s flush)</td><td>Scheduler (via views)</td><td>control-plane: one row per scheduled task</td></tr>
+          <tr><td>Reporting DB</td><td>Data Processor</td><td>Client-facing accounting/reconciliation tools</td><td>ledger-plane: one row per realized balance</td></tr>
+        </table>
+      </div>
+      <p>The Scheduler reads <strong>SQL views over the job store</strong> rather than the base table directly — this is what keeps a per-minute sweep cheap regardless of how large the job history grows, since the view pre-filters to jobs due in the current window. Data flows one direction only: control-plane state (job store) never receives data from the ledger plane (reporting DB); the two only meet logically, through <code class="field">account_id</code>.</p>
+    </section>
+
+    <section id="integration">
+      <h2><span class="num">§5</span>Integration patterns</h2>
+      <p>Every hop in this system is deliberately either synchronous-and-fast or asynchronous-and-durable — nothing in between:</p>
+      <div class="overflow-table">
+        <table>
+          <tr><th>Hop</th><th>Style</th><th>Protocol</th><th>Why</th></tr>
+          <tr><td>Scheduler → Kafka</td><td><span class="swatch"><span class="dot" style="background:var(--accent-2)"></span>async</span></td><td>Kafka (ordered, bulk)</td><td>absorb the burst, preserve order</td></tr>
+          <tr><td>Consumer → Datafetch</td><td><span class="swatch"><span class="dot" style="background:var(--accent)"></span>sync</span></td><td>gRPC (multiplexed)</td><td>low latency, high fan-out</td></tr>
+          <tr><td>Datafetch → Account API</td><td><span class="swatch"><span class="dot" style="background:var(--accent)"></span>sync</span></td><td>gRPC (multiplexed)</td><td>credentials needed before every fetch</td></tr>
+          <tr><td>Account API → Vault</td><td><span class="swatch"><span class="dot" style="background:var(--accent)"></span>sync, cached</span></td><td>Vault API</td><td>security boundary, cached to avoid per-job cost</td></tr>
+          <tr><td>Datafetch → Exchange</td><td><span class="swatch"><span class="dot" style="background:var(--accent)"></span>sync</span></td><td><code class="field">ccxt</code> / aiohttp</td><td>the actual external dependency</td></tr>
+          <tr><td>Datafetch → S3 / RabbitMQ</td><td><span class="swatch"><span class="dot" style="background:var(--accent-2)"></span>async</span></td><td>S3 API + AMQP</td><td>decouple fetch from processing</td></tr>
+          <tr><td>*/ → Task Status API</td><td><span class="swatch"><span class="dot" style="background:var(--accent)"></span>sync, batched</span></td><td>internal API call</td><td>status visibility without hammering SQL</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="reliability">
+      <h2><span class="num">§6</span>Reliability &amp; failure handling</h2>
+      <ul>
+        <li><strong>Duplicate jobs</strong> — collapsed at the Task Status API before they ever cause a double-write.</li>
+        <li><strong>Stale jobs</strong> — a 3-hour expiry on in-flight status prevents a hung job from blocking its account indefinitely.</li>
+        <li><strong>Datafetch/Consumer failures</strong> — up to 3 retries at the Consumer layer before a job is marked <span class="badge failed">failed</span>.</li>
+        <li><strong>Data Processor failures</strong> — up to 3 retries, then routed to a dead-letter queue for manual recovery rather than silent loss.</li>
+        <li><strong>Kafka node failure</strong> — covered by the 3-node replicated cluster.</li>
+      </ul>
+    </section>
+
+    <section id="scale">
+      <h2><span class="num">§7</span>Performance &amp; scale reference</h2>
+      <div class="overflow-table">
+        <table>
+          <tr><th>Component</th><th>Stack</th><th>Footprint</th><th class="num">Latency / throughput</th></tr>
+          <tr><td>Scheduler</td><td>.NET</td><td>—</td><td class="num">t+150–200 ms @ 20k jobs</td></tr>
+          <tr><td>Kafka</td><td>—</td><td>30 partitions · 3 nodes</td><td class="num">bulk, ordered</td></tr>
+          <tr><td>Consumer</td><td>.NET</td><td>—</td><td class="num">t+600–700 ms @ 20k jobs</td></tr>
+          <tr><td>Account API</td><td>Go</td><td>—</td><td class="num">p99 1 ms / p100 40 ms @ 20k concurrent</td></tr>
+          <tr><td>Datafetch Service</td><td>Python</td><td>280 pods / 5 nodes<br/>(84 cores · 250 GB RAM each)</td><td class="num">t+7–8 s @ 20k jobs<br/>~500k outbound requests</td></tr>
+          <tr><td>Task Status API</td><td>.NET</td><td>—</td><td class="num">10s flush cadence · 3h expiry</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="assumptions">
+      <h2><span class="num">§8</span>Confirmed decisions</h2>
+      <p>Four points that were open questions in the first pass, now confirmed by the platform team:</p>
+      <ul>
+        <li><strong>Job Store and Reporting DB are separate physical databases</strong> — not just logically separate. Control-plane scheduling state and the client-facing ledger never share a database instance.</li>
+        <li><strong>Datafetch → Account API runs over gRPC</strong> — same choice as Consumer → Datafetch, and for the same reason: multiplexed connections under high concurrent fan-out. Reflected in §2.4, §2.7, §3, §5 and Figs. 03 and 05 above.</li>
+        <li><strong>The UTC 00:00 burst is purely absorbed by scale</strong> — there is no jitter, staggering, or randomized offset smoothing client requests away from the exact cut-off. 280 Datafetch pods and 30 Kafka partitions are the entire mitigation; every account that asked for midnight gets exactly midnight.</li>
+        <li><strong>Sub-account fetch happens inside the same Datafetch invocation</strong> as the main-account fetch — a second concurrent internal batch, not a separately scheduled job. One job in the Job Store produces both S3 writes and both RabbitMQ messages.</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById("themeToggle");
+    var STORAGE_KEY = "nav-arch-theme";
+
+    function safeGet() {
+      try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+    }
+    function safeSet(v) {
+      try { localStorage.setItem(STORAGE_KEY, v); } catch (e) {}
+    }
+    function effectiveTheme() {
+      var explicit = root.getAttribute("data-theme");
+      if (explicit === "dark" || explicit === "light") return explicit;
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+
+    var saved = safeGet();
+    if (saved === "dark" || saved === "light") {
+      root.setAttribute("data-theme", saved);
+    }
+
+    if (window.mermaid) {
+      window.mermaid.initialize({
+        startOnLoad: true,
+        theme: effectiveTheme() === "dark" ? "dark" : "default",
+        securityLevel: "loose",
+        fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif"
+      });
+    }
+
+    btn.addEventListener("click", function () {
+      var next = effectiveTheme() === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      safeSet(next);
+      // Mermaid doesn't live-reload its own theme; a reload picks up the new one on re-render.
+    });
+  })();
+</script>
+</body>
+</html>
