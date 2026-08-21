@@ -4,6 +4,7 @@ title: "NAV Back-Office Balance Pipeline"
 description: "System architecture walkthrough for a job-scheduling and balance ingestion platform built for UTC 00:00 cut-offs."
 date: 2026-08-06 08:00:00 +0000
 categories: post
+tags: [SystemArchitecture, JobScheduling, BalancePipeline, Kafka, gRPC, Redis, S3, RabbitMQ, DotNet, Golang, Python, Fintech, CryptoExchanges, Blockchain, BackOffice]
 featured_image: ""
 ---
 

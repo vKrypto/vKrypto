@@ -2,7 +2,10 @@
 	<meta charset="utf-8">
 	<title>{% if page.title %}{{page.title}} - {{site.title}}{% else %}{{site.title}}{% endif %}</title>
 	<meta name="description" content="{% if page.description %}{{page.description}}{% else %}{{site.description}}{% endif %}">
+	<meta name="robots" content="index, follow">
+	{% if page.tags %}<meta name="keywords" content="{{ page.tags | join: ', ' }}">{% endif %}
   <!-- Edit site and author settings in `_config.yml` to make the social details your own -->
+  <!-- og:title/description/url/type/site_name and canonical are emitted by jekyll-seo-tag (json_ld.html below) -->
 
   {% if page.date %}
     <meta content="{{ page.date | date_to_xmlschema }}" property="article:published_time">
@@ -55,7 +58,6 @@
 
   {% if page.img %}
     <meta name="twitter:image:src" content="{{ site.url }}{{ site.baseurl }}/assets/img/{{ page.img }}">
-    {% if page.large_image %}<meta name="twitter:card" content="summary_large_image">{% endif %}
     {% if page.description %}<meta name="twitter:image:alt" content="{{ page.description }}">{% endif %}
   {% else %}
     <meta name="twitter:image:src" content="{{ site.url }}{{ site.baseurl }}/assets/img/{{ site.author-img }}">
