@@ -140,22 +140,9 @@ At roughly 5–10k devices, or if sends start to approach the 30 s timeout: put 
 and delivery, and add a GSI instead of scanning for broadcasts. Optionally put CloudFront in front of
 the Function URL to get free country/city headers (the code already reads them).
 
-### Optional local information logger
+### Local file-based backend
 
-The notification page also offers a separate information form with available options selected by default.
-Submit requests only selected browser capabilities (location, window management,
-camera/microphone device metadata, connection details, browser details, battery).
-Snapshots appear on the page and in the browser console immediately and every 60 seconds
-after completion. Nothing from this logger is sent to the notification backend or persisted.
-Camera/microphone tracks stop immediately after the permission request; no media is recorded.
-Stop or leaving the page cancels logging. Reloading requires selecting and submitting again.
-Background browser throttling can delay snapshots. Unsupported capabilities are disabled.
-Automatic LAN discovery is unavailable; local network access requires a specific device
-address and browser support. Action-based permissions are described rather than requested
-without a corresponding feature.
-
-Serve `build` locally, for example `python -m http.server 8976 --directory build`, then open
-`http://localhost:8976/notify/`. Notification delivery still requires configuring `API_URL`.
-Prior local Chrome verification covered empty submission, selected fields only,
-repeated scheduling (with the 60-second timer accelerated), and cancellation via Stop.
-Real hardware permission prompts require interactive testing on a supported browser.
+For the current local visitor page, permission snapshots and the device-selection
+admin page, use [backend/README.md](../backend/README.md). The frontend now calls
+the same-origin `/api` endpoints served by that backend. The Lambda service above
+is a separate deployment option and is not used by the local frontend.

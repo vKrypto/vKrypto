@@ -1,5 +1,4 @@
-// Set this to the ApiUrl output printed by `sam deploy` (no trailing slash needed).
-const API_URL = "https://REPLACE-ME.lambda-url.us-east-1.on.aws";
+import { api } from "./client.js";
 const POLICY_VERSION = "2026-11-07";
 
 const $ = (id) => document.getElementById(id);
@@ -12,17 +11,6 @@ const setStatus = (text, kind = "") => {
   statusEl.textContent = text;
   statusEl.dataset.kind = kind;
 };
-
-function getUserId() {
-  // Anonymous, stable per browser. Replace with your real user id if visitors log in.
-  let id;
-  try { id = localStorage.getItem("notify-user-id"); } catch {}
-  if (!id) {
-    id = crypto.randomUUID();
-    try { localStorage.setItem("notify-user-id", id); } catch {}
-  }
-  return id;
-}
 
 function urlBase64ToUint8Array(base64) {
   const padded = (base64 + "=".repeat((4 - (base64.length % 4)) % 4)).replace(/-/g, "+").replace(/_/g, "/");
@@ -40,21 +28,9 @@ function getLocation() {
   });
 }
 
-async function api(path, body) {
-  const res = await fetch(API_URL.replace(/\/$/, "") + path, {
-    method: body ? "POST" : "GET",
-    headers: body ? { "content-type": "application/json" } : {},
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-  return data;
-}
-
 async function enable() {
   enableBtn.disabled = true;
   try {
-    if (API_URL.includes("REPLACE-ME")) throw new Error("Notification backend is not configured. Optional information logging below works locally.");
     setStatus("Asking for permission…");
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
@@ -75,7 +51,6 @@ async function enable() {
 
     setStatus("Registering this device…");
     await api("/devices", {
-      userId: getUserId(),
       subscription: subscription.toJSON(),
       geo,
       language: navigator.language,
@@ -98,11 +73,14 @@ async function disable() {
     const reg = await navigator.serviceWorker.getRegistration("./");
     const sub = await reg?.pushManager.getSubscription();
     if (sub) {
-      await api("/devices/unsubscribe", { userId: getUserId(), endpoint: sub.endpoint }).catch(() => {});
+      await api("/devices/unsubscribe", { endpoint: sub.endpoint });
       await sub.unsubscribe();
     }
+    window.dispatchEvent(new Event("notify-unsubscribed"));
     setStatus("Unsubscribed. This device won't get notifications.");
     render(false);
+  } catch (err) {
+    setStatus(`Could not unsubscribe: ${err.message}`, "error");
   } finally {
     disableBtn.disabled = false;
   }

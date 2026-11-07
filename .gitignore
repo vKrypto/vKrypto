@@ -42,3 +42,6 @@ __pycache__/
 build/Gemfile.lock
 
 */.jekyll-cache
+# Local notification backend
+backend/data/
+backend/node_modules/

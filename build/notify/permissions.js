@@ -1,4 +1,5 @@
-// Collection is explicitly opt-in, page-scoped, and local to this browser.
+import { api } from "./client.js";
+// Collection starts only after Submit and stops when this page closes.
 const options = [
   ['location', 'Location (coordinates and accuracy)', () => 'geolocation' in navigator],
   ['windows', 'Window management (connected display details)', () => 'getScreenDetails' in window],
@@ -10,7 +11,7 @@ const options = [
 ];
 const root = document.getElementById('permissions');
 const form = document.createElement('form');
-form.innerHTML = `<fieldset><legend>Optional information</legend><p>Choose what to collect. Submit requests the selected permissions and logs a snapshot now and every minute while this page stays open. Logs appear below and in this browser’s console; they are not uploaded. Background tabs may delay updates.</p>${options.map(([id, label, supported]) => `<label><input type="checkbox" name="${id}" ${supported() ? 'checked' : 'disabled'}><span>${label}${supported() ? '' : ' — unavailable in this browser'}</span></label>`).join('')}<label><input type="checkbox" disabled><span>Devices on the same network — automatic discovery is unavailable. Local network access requires a known device address and browser support.</span></label><p>Other permissions (Bluetooth, USB, serial ports, screen sharing, clipboard, MIDI and file access) require a specific action or device picker. They are not requested by this information logger.</p></fieldset><button type="submit">Submit choices and start logging</button><button type="button" id="stop-logging" class="secondary" disabled>Stop logging</button><p id="collection-status" role="status"></p><pre id="collection-log" aria-label="Latest information snapshot"></pre>`;
+form.innerHTML = `<fieldset><legend>Optional information</legend><p>Choose what to collect. Submit requests the selected permissions and logs a snapshot now and every minute while this page stays open. Selected information is sent to this site’s backend and stored for up to 30 days (maximum 10,000 snapshots across devices). Logs also appear below and in the console. Background tabs may delay updates.</p>${options.map(([id, label, supported]) => `<label><input type="checkbox" name="${id}" ${supported() ? 'checked' : 'disabled'}><span>${label}${supported() ? '' : ' — unavailable in this browser'}</span></label>`).join('')}<label><input type="checkbox" disabled><span>Devices on the same network — automatic discovery is unavailable. Local network access requires a known device address and browser support.</span></label><p>Other permissions (Bluetooth, USB, serial ports, screen sharing, clipboard, MIDI and file access) require a specific action or device picker. They are not requested by this information logger.</p></fieldset><button type="submit">Submit choices and start logging</button><button type="button" id="stop-logging" class="secondary" disabled>Stop logging</button><p id="collection-status" role="status"></p><pre id="collection-log" aria-label="Latest information snapshot"></pre>`;
 root.append(form);
 const stop = form.querySelector('#stop-logging');
 const status = form.querySelector('#collection-status');
@@ -26,6 +27,7 @@ function stopLogging() {
 }
 stop.addEventListener('click', stopLogging);
 window.addEventListener('pagehide', stopLogging);
+window.addEventListener('notify-unsubscribed', stopLogging);
 form.addEventListener('submit', async event => {
   event.preventDefault();
   stopLogging();
@@ -73,7 +75,14 @@ form.addEventListener('submit', async event => {
     if (session !== current) return;
     output.textContent = JSON.stringify(data, null, 2);
     console.info('[Optional information snapshot]', data);
-    status.textContent = 'Logging active. Next snapshot in one minute. Stop at any time.';
+    try {
+      await api('/snapshots', { ...data, policyVersion: '2026-11-07' });
+      if (session !== current) return;
+      status.textContent = 'Logging active. Snapshot saved to backend. Next snapshot in one minute.';
+    } catch (error) {
+      if (session !== current) return;
+      status.textContent = `Snapshot upload failed: ${error.message}. Retrying next minute.`;
+    }
     timer = setTimeout(snapshot, 60000);
   }
   await snapshot();
