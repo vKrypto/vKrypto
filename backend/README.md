@@ -57,3 +57,18 @@ All admin routes need `x-admin-token`. Only selected snapshot fields are saved.
 including persistence, access control, endpoint validation, selected fields,
 targeted delivery, expired subscriptions and unsubscribe deletion. It does not
 send real push messages.
+
+## Jekyll / GitHub Pages
+
+The existing Pages workflow builds `build/` with Jekyll into `_site/`. The
+notification page and its JavaScript have no front matter and are copied as
+static assets. A post-build check verifies every notification asset before
+uploading `_site`. Backend code and private data live outside the Jekyll source.
+
+Console snapshots are pretty-printed JSON strings (`JSON.stringify`), so the
+message text can be copied directly into a JSON parser.
+
+GitHub Pages hosts only the static frontend. The Node backend must run separately;
+the current `/api` URLs assume the backend serves the page or an API reverse proxy
+is available on the same origin. GitHub Pages alone cannot accept snapshot uploads
+or send push notifications. Local development continues at port 8980.

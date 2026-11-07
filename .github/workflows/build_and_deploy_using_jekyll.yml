@@ -28,8 +28,18 @@ jobs:
         with:
           source: ./build
           destination: ./_site
+      - name: Verify notification page and browser assets
+        shell: bash
+        run: |
+          for file in index.html notify.js permissions.js client.js sw.js manifest.json; do
+            test -s "./_site/notify/$file"
+            cmp "./build/notify/$file" "./_site/notify/$file"
+          done
+          test ! -d ./_site/backend
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
 
   # Deployment job
   deploy:

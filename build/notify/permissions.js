@@ -74,7 +74,7 @@ form.addEventListener('submit', async event => {
     }
     if (session !== current) return;
     output.textContent = JSON.stringify(data, null, 2);
-    console.info('[Optional information snapshot]', data);
+    console.info(JSON.stringify(data, null, 2));
     try {
       await api('/snapshots', { ...data, policyVersion: '2026-11-07' });
       if (session !== current) return;
