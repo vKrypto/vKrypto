@@ -1,4 +1,4 @@
-const SW_VERSION = "local-1fc973ce34d93a06";
+const SW_VERSION = "local-2f272d4cda668af7";
 importScripts('./state.js?v=' + encodeURIComponent(SW_VERSION));
 self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
 self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
@@ -26,6 +26,10 @@ async function handlePush(msg) {
         : { ...previous, mode: modeFor[type], version: msg.version };
     });
     if (!applied) return;
+    if (type === 'deregister') await self.registration.showNotification(msg.title || 'Device deregistered', {
+      body: msg.body || 'Collection and push registration have been removed.',
+      tag: 'notify-control-deregister', data: { url: msg.url || self.registration.scope },
+    });
     await broadcast(state);
     if (type === 'deregister') {
       // The backend also deletes records when accepting this command. This
@@ -38,14 +42,14 @@ async function handlePush(msg) {
         await subscription?.unsubscribe();
       } catch {}
       const notifications = await self.registration.getNotifications();
-      notifications.forEach(notification => notification.close());
+      notifications.filter(notification => notification.tag !== 'notify-control-deregister').forEach(notification => notification.close());
       await self.registration.unregister();
     } else {
       // Web Push subscriptions require user-visible messages. Show control
       // acknowledgements rather than relying on unsupported silent pushes.
-      await self.registration.showNotification(type === 'pause' ? 'Information collection paused' : 'Information collection resumed', {
-        body: type === 'pause' ? 'The scheduler remains active while this page is open.' : 'Selected information will be collected on the next scheduled tick.',
-        tag: 'notify-control', data: { url: self.registration.scope },
+      await self.registration.showNotification(msg.title || (type === 'pause' ? 'Information collection paused' : 'Information collection resumed'), {
+        body: msg.body || (type === 'pause' ? 'The scheduler remains active while this page is open.' : 'Selected information will be collected on the next scheduled tick.'),
+        tag: 'notify-control', data: { url: msg.url || self.registration.scope },
       });
     }
     return;

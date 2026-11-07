@@ -165,6 +165,9 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     await until(() => app.store.read().logs.length > count, 'logger restarted for pause test');
     async function command(type, id = firstId) {
       await admin.locator('#message-type').selectOption(type);
+      for (const field of ['title', 'body', 'url']) assert.equal(await admin.locator('#' + field).isEnabled(), true);
+      await admin.locator('#title').fill(`Custom ${type} title`);
+      await admin.locator('#body').fill(`Custom ${type} description`);
       await admin.locator(`#devices input[value="${id}"]`).check();
       const previous = sent.length;
       await admin.locator('#send button').click();
@@ -173,6 +176,7 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     }
     await command('pause');
     await until(async () => (await page.evaluate(() => NotifyState.read())).mode === 'paused', 'worker persisted pause');
+    await until(async () => page.evaluate(async () => (await (await navigator.serviceWorker.getRegistration('./')).getNotifications()).some(n => n.title === 'Custom pause title' && n.body === 'Custom pause description')), 'control notification uses custom wording');
     await until(() => app.store.read().devices[0].mode === 'paused', 'backend persisted pause');
     await sleep(300);
     const pausedLogs = app.store.read().logs.length, pausedConsole = consoleSnapshots.length;

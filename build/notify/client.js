@@ -170,7 +170,7 @@ async function publishControl() {
     const reg = await navigator.serviceWorker.getRegistration(new URL('./', import.meta.url));
     if (reg) {
       try { await (await reg.pushManager.getSubscription())?.unsubscribe(); } catch {}
-      try { (await reg.getNotifications()).forEach(notification => notification.close()); } catch {}
+      try { (await reg.getNotifications()).filter(notification => notification.tag !== 'notify-control-deregister').forEach(notification => notification.close()); } catch {}
       await reg.unregister();
     }
   }

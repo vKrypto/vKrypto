@@ -126,7 +126,8 @@ already blocks notifications requires changing its site settings before retrying
 ## Push message types
 
 `POST /api/admin/send` accepts `type`, `deviceIds`, and optional display fields.
-The admin page provides a message-type selector. Omitting `type` keeps the
+The admin page provides a message-type selector. Title, message and link remain
+editable for every type; supplied wording is displayed for control messages too. Omitting `type` keeps the
 existing `notification` behavior. Only `notification` needs a title.
 
 ```json
@@ -141,7 +142,7 @@ existing `notification` behavior. Only `notification` needs a title.
   a fresh page restores a previously enabled collector without requesting new permissions.
 - `deregister`: permanently disables the installation, aborts collection,
   deletes device/snapshot/delivery records, clears device credentials, closes
-  its notifications, unsubscribes push and unregisters its service worker.
+  earlier notifications, displays its final message, unsubscribes push and unregisters its service worker.
   A minimal terminal marker remains in IndexedDB to prevent automatic restart
   or re-registration after reload. The backend retains an opaque SHA-256 token
   fingerprint (no device metadata) so an undelivered command cannot trigger

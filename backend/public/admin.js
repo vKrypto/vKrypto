@@ -37,5 +37,5 @@ run(load);
 $('message-type').onchange = () => {
   const notification = $('message-type').value === 'notification';
   $('title').required = notification;
-  for (const id of ['title', 'body', 'url']) $(id).disabled = !notification;
+  for (const id of ['title', 'body', 'url']) $(id).disabled = false;
 };
