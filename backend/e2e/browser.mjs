@@ -23,7 +23,7 @@ async function listen(server) {
 }
 async function close(server) { if (server) { server.closeAllConnections(); await new Promise(r => server.close(r)); } }
 
-for (const separate of [false, true, 'detect']) test(`browser integration: ${separate ? 'separate frontend/API origins' : 'same origin'}`, { timeout: 60000 }, async () => {
+for (const separate of [false, true, 'detect']) test(`browser integration: ${separate === 'detect' ? 'automatic local discovery' : separate ? 'separate frontend/API origins' : 'same origin'}`, { timeout: 60000 }, async () => {
   const dir = await mkdtemp(join(tmpdir(), 'notify-e2e-'));
   let browser, backend, frontend;
   try {
@@ -125,7 +125,7 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     await page.locator('#permissions input').evaluateAll(inputs => inputs.forEach(i => { i.checked = i.name === 'browser' || i.name === 'network'; }));
     await page.locator('#permissions button[type=submit]').click();
     await until(() => app.store.read().logs.length >= 2, 'repeated snapshots reaching backend');
-    assert(app.store.read().logs.every(l => l.deviceId === firstId && l.snapshot.browser && l.snapshot.network && !l.snapshot.location));
+    assert(app.store.read().logs.every(l => l.deviceId === firstId && l.snapshot.browser && l.snapshot.network && !l.snapshot.location), JSON.stringify({ firstId, logs: app.store.read().logs }));
     assert(consoleSnapshots.length > 0 && consoleSnapshots.every(l => l.selected.includes('browser')));
     await page.locator('#stop-logging').click();
     await sleep(300);
@@ -232,7 +232,7 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     await page.locator('#disable').click();
     await until(async () => (await page.locator('#status').innerText()).includes('Unsubscribed'), 'unsubscribe');
     await sleep(1200);
-    assert.equal(app.store.read().devices.length, 0); assert.equal(app.store.read().logs.length, 0);
+    assert.equal(app.store.read().devices.length, 0, JSON.stringify(app.store.read().devices.map(({ id, subscription, selected }) => ({ id, push: !!subscription, selected })))); assert.equal(app.store.read().logs.length, 0);
     // Deregistration is terminal: delete records, stop scheduler, remove worker,
     // forget credentials, and remain inactive after the next page load.
     await page.locator('#permissions input').evaluateAll(inputs => inputs.forEach(i => { i.checked = ['notifications', 'browser'].includes(i.name); }));

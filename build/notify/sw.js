@@ -1,5 +1,5 @@
-const SW_VERSION = "local-3b0eaa3fef6ed362";
-importScripts('./state.js');
+const SW_VERSION = "local-1fc973ce34d93a06";
+importScripts('./state.js?v=' + encodeURIComponent(SW_VERSION));
 self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
 self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
 const commands = new Set(['pause', 'resume', 'deregister']);

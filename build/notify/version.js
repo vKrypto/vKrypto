@@ -49,7 +49,10 @@ async function check() {
     const pending = (await controlState()).workerUpdate;
     const saved = await controlState();
     const matches = latest && await workerVersion(latest.active) === version && (!saved.swVersion || saved.swVersion === version);
-    if (matches && !pending) return;
+    if (matches && !pending) {
+      if (state.swVersion && state.swVersion !== version) reloadOnce(version);
+      return;
+    }
     const original = await latest?.pushManager.getSubscription();
     const needsPush = Boolean(original || pending?.needsPush || saved.registration === 'registered');
     if (needsPush) await api('/health'); // Keep the old installation if API is offline.
@@ -75,11 +78,14 @@ async function check() {
     }
     await NotifyState.update(({ workerUpdate, ...state }) => state.mode === 'deregistered' ? state : { ...state, swVersion: version, registration: needsPush && Notification.permission === 'granted' ? 'registered' : 'unregistered' });
     // sessionStorage prevents a failed/partially propagated deployment reload loop.
-    const reloadKey = 'notify-reloaded-version';
-    if (sessionStorage.getItem(reloadKey) !== version) { sessionStorage.setItem(reloadKey, version); location.reload(); }
+    reloadOnce(version);
   };
   if (navigator.locks) await navigator.locks.request(lock, replace);
   else await replace();
+}
+function reloadOnce(version) {
+  const key = 'notify-reloaded-version';
+  if (sessionStorage.getItem(key) !== version) { sessionStorage.setItem(key, version); location.reload(); }
 }
 // Shared layouts load this module on ordinary site pages as well as /notify/.
 ensureWorkerVersion().catch(error => window.dispatchEvent(new CustomEvent('notify-update-error', { detail: error.message })));

@@ -71,36 +71,58 @@ function savedIdentity(key) {
   } catch {}
   return null;
 }
-async function clearIdentity() {
+async function clearIdentity(expectedToken) {
   const { key } = await settings();
+  const current = savedIdentity(key);
+  // A late 401 from another tab/request must not erase a renewed identity.
+  if (expectedToken && ((current && current.token !== expectedToken) || (!current && pending))) return;
   try { localStorage.removeItem(key); } catch {}
   pending = undefined;
   await NotifyState.update(({ credential, ...state }) => state);
 }
 async function remember(identity, base) {
   const state = await NotifyState.update(state => state.mode === 'deregistered' ? state : { ...state, credential: { ...identity, base } });
-  if (state.mode === 'deregistered') throw Error('This device has been permanently deregistered.');
+  if (state.mode === 'deregistered') {
+    // A session created just before a terminal push must not leave an orphan.
+    await request(base + '/devices/unsubscribe', { method: 'POST', headers: { 'content-type': 'application/json', 'x-device-token': identity.token }, body: '{}' }).catch(() => {});
+    try { localStorage.removeItem(`notify-device-session:${base}`); } catch {}
+    throw Error('This device has been permanently deregistered.');
+  }
   return identity;
 }
-async function session() {
+async function session(signal) {
+  signal?.throwIfAborted();
+  if ((await NotifyState.read()).mode === 'deregistered') throw Error('This device has been permanently deregistered.');
   const { base, key } = await settings();
   const saved = savedIdentity(key);
   if (saved) return remember(saved, base);
-  if (!pending) pending = (async () => {
-    const response = await request(base + '/session', { method: 'POST' });
-    const data = await readJson(response);
-    if (!response.ok) throw Error(data.error || 'Device registration failed.');
-    try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
-    return remember(data, base);
-  })().catch(error => { pending = undefined; throw error; });
+  if (!pending) {
+    const create = async () => {
+      if ((await NotifyState.read()).mode === 'deregistered') throw Error('This device has been permanently deregistered.');
+      signal?.throwIfAborted();
+      const existing = savedIdentity(key);
+      if (existing) return remember(existing, base);
+      const response = await request(base + '/session', { method: 'POST' });
+      const data = await readJson(response);
+      if (!response.ok) throw Error(data.error || 'Device registration failed.');
+      if (signal?.aborted) {
+        await request(base + '/devices/unsubscribe', { method: 'POST', headers: { 'content-type': 'application/json', 'x-device-token': data.token }, body: '{}' }).catch(() => {});
+        signal.throwIfAborted();
+      }
+      try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
+      return remember(data, base);
+    };
+    pending = (navigator.locks ? navigator.locks.request(`notify-session:${base}`, create) : create()).catch(error => { pending = undefined; throw error; });
+  }
   return pending;
 }
 export async function api(path, body, options = {}, retry = true) {
   if ((await NotifyState.read()).mode === 'deregistered') throw Error('This device has been permanently deregistered.');
   options.signal?.throwIfAborted();
   const { base } = await settings();
+  options.signal?.throwIfAborted();
   const privateRequest = Boolean(body) || path === '/device';
-  const identity = privateRequest ? await session() : null;
+  const identity = privateRequest ? await session(options.signal) : null;
   options.signal?.throwIfAborted();
   const response = await request(base + path, {
     signal: options.signal,
@@ -114,7 +136,7 @@ export async function api(path, body, options = {}, retry = true) {
     await publishControl();
   }
   if (response.status === 401 && privateRequest) {
-    await clearIdentity();
+    await clearIdentity(identity.token);
     // A deleted/reset database must not permanently strand a browser's saved token.
     if (retry && !options.signal?.aborted && path !== '/device' && path !== '/devices/unsubscribe') return api(path, body, options, false);
   }
