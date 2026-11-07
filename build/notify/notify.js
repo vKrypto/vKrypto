@@ -1,3 +1,4 @@
+import { ensureWorkerVersion } from "./version.js";
 import { api, deviceStatus, controlState } from "./client.js";
 const POLICY_VERSION = "2026-11-07";
 
@@ -51,7 +52,7 @@ async function enable({ includeLocation = shareLocation.checked } = {}) {
     }
 
     if ((await controlState()).mode === 'deregistered') throw Error('This device has been permanently deregistered.');
-    const reg = await navigator.serviceWorker.register("./sw.js", { scope: "./" });
+    const reg = await navigator.serviceWorker.getRegistration("./") || await navigator.serviceWorker.register("./sw.js", { scope: "./", updateViaCache: "none" });
     await navigator.serviceWorker.ready;
 
     const { publicKey } = await api("/vapid-public-key");
@@ -112,6 +113,7 @@ async function disable() {
 }
 
 function render(subscribed) {
+  NotifyState.update(state => state.mode === 'deregistered' ? state : { ...state, registration: subscribed ? 'registered' : 'unregistered' }).catch(console.error);
   enableBtn.hidden = subscribed;
   shareLocation.closest("label").hidden = subscribed;
   disableBtn.hidden = !subscribed;
@@ -129,6 +131,7 @@ window.addEventListener('notify-control', event => {
   if (!deregistered) enableBtn.disabled = paused;
 });
 async function init() {
+  try { await ensureWorkerVersion(); } catch (error) { setStatus(error.message, 'error'); return; }
   const state = await controlState();
   if (state.mode === 'deregistered') { showDeregistered(); return; }
   paused = state.mode === 'paused';
@@ -157,6 +160,8 @@ async function init() {
   }
 }
 
+shareLocation.addEventListener('change', () => NotifyState.preferences({ shareSubscriptionLocation: shareLocation.checked }));
+controlState().then(state => { if (typeof state.shareSubscriptionLocation === 'boolean') shareLocation.checked = state.shareSubscriptionLocation; });
 enableBtn.addEventListener("click", () => enableNotifications());
 disableBtn.addEventListener("click", disable);
 init();

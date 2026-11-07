@@ -1,3 +1,4 @@
+import { ensureWorkerVersion } from "./version.js";
 import { api, controlState } from "./client.js";
 import { enableNotifications } from "./notify.js";
 // Collection starts only after Submit and stops when this page closes.
@@ -17,6 +18,7 @@ root.append(form);
 const stop = form.querySelector('#stop-logging');
 const status = form.querySelector('#collection-status');
 const output = form.querySelector('#collection-log');
+form.addEventListener('change', () => NotifyState.preferences({ sharing: Object.fromEntries([...form.querySelectorAll('input[name]')].map(input => [input.name, input.checked && !input.disabled])) }).catch(console.error));
 let session = 0;
 let timer;
 let uploadController;
@@ -47,11 +49,17 @@ function applyControl(state) {
 window.addEventListener('notify-control', event => applyControl(event.detail));
 form.querySelector('fieldset').disabled = true;
 submit.disabled = true;
-controlState().then(state => {
+Promise.all([controlState(), ensureWorkerVersion()]).then(async () => {
+  const state = await controlState();
+  for (const input of form.querySelectorAll('input[name]')) {
+    if (!input.disabled && typeof state.sharing?.[input.name] === 'boolean') input.checked = state.sharing[input.name];
+  }
   if (state.mode !== 'deregistered') form.querySelector('fieldset').disabled = false;
   applyControl(state);
+  if (state.loggingEnabled && state.mode !== 'deregistered') form.dispatchEvent(new CustomEvent('submit', { cancelable: true, detail: { restore: true } }));
 }).catch(() => { status.textContent = 'Could not read collection control state. Collection is disabled.'; });
-function stopLogging() {
+function stopLogging({ persist = true } = {}) {
+  if (persist) NotifyState.preferences({ loggingEnabled: false }).catch(console.error);
   session++;
   running = false;
   clearTimeout(timer);
@@ -61,27 +69,37 @@ function stopLogging() {
   status.textContent = 'Logging stopped. Browser grants can be revoked in site settings.';
 }
 stop.addEventListener('click', stopLogging);
-window.addEventListener('pagehide', stopLogging);
+window.addEventListener('pagehide', () => stopLogging({ persist: false }));
+window.addEventListener('notify-updating', () => stopLogging({ persist: false }));
 window.addEventListener('notify-unsubscribed', stopLogging);
 form.addEventListener('submit', async event => {
   event.preventDefault();
-  if (remoteMode !== 'active') return;
-  stopLogging();
+  const restoring = event.detail?.restore === true;
+  if (remoteMode === 'deregistered' || (remoteMode === 'paused' && !restoring)) return;
+  stopLogging({ persist: false });
   const current = session;
   const chosen = options.filter(([id]) => form.elements[id].checked).map(([id]) => id);
   const wantsPush = form.elements.notifications.checked;
   if (!chosen.length && !wantsPush) { status.textContent = 'Choose at least one available option.'; return; }
+  if (!restoring) NotifyState.preferences({ sharing: Object.fromEntries([...form.querySelectorAll('input[name]')].map(input => [input.name, input.checked && !input.disabled])), loggingEnabled: chosen.length > 0 }).catch(console.error);
   running = true;
   form.querySelector('button[type=submit]').disabled = true;
   stop.disabled = false;
   status.textContent = 'Requesting selected permissions…';
   // Request push permission immediately inside the Submit gesture.
-  const push = wantsPush ? enableNotifications({ includeLocation: false }) : Promise.resolve(null);
+  const push = wantsPush && !restoring ? enableNotifications({ includeLocation: false }) : Promise.resolve(null);
   const resources = {};
   const errors = {};
   // Start activation-dependent requests directly from the submit gesture.
-  const requests = chosen.map(async id => {
+  let prepared = false;
+  async function prepare(restored) {
+    const requests = chosen.map(async id => {
     try {
+      const permission = { location: 'geolocation', windows: 'window-management', camera: 'camera', microphone: 'microphone' }[id];
+      if (restored && permission && (await navigator.permissions.query({ name: permission })).state !== 'granted') {
+        errors[id] = 'Permission is not granted. Stop and submit again to request it.';
+        return;
+      }
       if (id === 'windows') resources.windows = await window.getScreenDetails();
       if (id === 'camera' || id === 'microphone') {
         const stream = await navigator.mediaDevices.getUserMedia({ [id === 'camera' ? 'video' : 'audio']: true });
@@ -91,10 +109,13 @@ form.addEventListener('submit', async event => {
       }
       if (id === 'battery') resources.battery = await navigator.getBattery();
     } catch (error) { errors[id] = error.name; }
-  });
-  const [, pushEnabled] = await Promise.all([Promise.all(requests), push]);
+    });
+    await Promise.all(requests);
+    prepared = true;
+  }
+  const [, pushEnabled] = await Promise.all([remoteMode === 'paused' ? Promise.resolve() : prepare(restoring), push]);
   if (session !== current) return;
-  if (wantsPush && !pushEnabled) errors.notifications = 'Push was not enabled. See the notification status above.';
+  if (wantsPush && pushEnabled === false) errors.notifications = 'Push was not enabled. See the notification status above.';
   if (!chosen.length) {
     stopLogging();
     status.textContent = pushEnabled ? 'Push notifications enabled. No information logging selected.' : errors.notifications;
@@ -140,7 +161,11 @@ form.addEventListener('submit', async event => {
     try {
       const state = await controlState();
       if (state.mode !== remoteMode || state.version !== controlVersion) applyControl(state);
-      if (state.mode === 'active') await snapshot();
+      if (state.mode === 'paused') status.textContent = 'Paused remotely. The scheduler continues without collecting, logging or uploading.';
+      if (state.mode === 'active') {
+        if (!prepared) await prepare(true);
+        await snapshot();
+      }
     } catch (error) {
       if (session === current) status.textContent = `Collection suspended: ${error.message}`;
     } finally {

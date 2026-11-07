@@ -11,7 +11,10 @@ import { createApp } from '../server.mjs';
 const here = dirname(fileURLToPath(import.meta.url));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function until(fn, message) {
-  for (let i = 0; i < 100; i++) { if (await fn()) return; await sleep(100); }
+  for (let i = 0; i < 100; i++) {
+    try { if (await fn()) return; } catch (error) { if (!/Execution context was destroyed|Cannot find context/.test(error.message)) throw error; }
+    await sleep(100);
+  }
   throw Error(message);
 }
 async function listen(server) {
@@ -32,8 +35,18 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
       // event and displays a real browser notification through Chrome DevTools.
       await pushClient.send('ServiceWorker.deliverPushMessage', { origin: visitorOrigin, registrationId, data: payload });
     } });
+    let deploymentVersion;
+    const originalWorker = await readFile(resolve(here, '../../build/notify/sw.js'), 'utf8');
+    function deploymentAsset(req, res) {
+      const path = new URL(req.url, 'http://local').pathname;
+      if (!deploymentVersion || !['/notify/sw.js', '/notify/version.json'].includes(path)) return false;
+      res.setHeader('cache-control', 'no-store');
+      res.setHeader('content-type', path.endsWith('.json') ? 'application/json' : 'text/javascript');
+      res.end(path.endsWith('.json') ? JSON.stringify({ version: deploymentVersion }) : originalWorker.replace(/^const SW_VERSION = .*;/, `const SW_VERSION = ${JSON.stringify(deploymentVersion)};`));
+      return true;
+    }
     let preflights = 0;
-    backend = http.createServer((req, res) => { if (req.method === 'OPTIONS') preflights++; app.handler(req, res); });
+    backend = http.createServer((req, res) => { if (deploymentAsset(req, res)) return; if (req.method === 'OPTIONS') preflights++; app.handler(req, res); });
     let apiOrigin;
     if (separate === 'detect') {
       await new Promise(r => backend.listen(8980, '127.0.0.1', r));
@@ -42,8 +55,9 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     visitorOrigin = apiOrigin;
     if (separate) {
       frontend = http.createServer(async (req, res) => {
-        if (req.url === '/notify/config.json') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify({ apiBaseUrl: separate === 'detect' ? '' : apiOrigin + '/api' })); }
-        const match = /^\/notify\/(index\.html|notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json|state\.js)?$/.exec(req.url);
+        if (deploymentAsset(req, res)) return;
+        if (new URL(req.url, 'http://local').pathname === '/notify/config.json') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify({ apiBaseUrl: separate === 'detect' ? '' : apiOrigin + '/api' })); }
+        const match = /^\/notify\/(index\.html|notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json|state\.js|version\.js|version\.json)?$/.exec(new URL(req.url, 'http://local').pathname);
         if (!match) { res.writeHead(404); return res.end(); }
         const file = match[1] || 'index.html';
         res.setHeader('content-type', file.endsWith('.js') ? 'text/javascript' : file.endsWith('.json') ? 'application/json' : 'text/html');
@@ -107,6 +121,7 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     // Reload reconciles with the server and migrates older stored credentials.
     await page.reload();
     await until(async () => (await page.locator('#status').innerText()).includes('synced with the backend'), 'reload subscription reconciliation');
+    await page.locator('#stop-logging').click();
     await page.locator('#permissions input').evaluateAll(inputs => inputs.forEach(i => { i.checked = i.name === 'browser' || i.name === 'network'; }));
     await page.locator('#permissions button[type=submit]').click();
     await until(() => app.store.read().logs.length >= 2, 'repeated snapshots reaching backend');
@@ -166,6 +181,26 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     assert.equal(app.store.read().logs.length, pausedLogs);
     assert.equal(consoleSnapshots.length, pausedConsole, 'no console snapshots while paused');
     assert((await page.evaluate(() => window.schedulerTicks)) > ticks, 'scheduler still ticks while paused');
+    const beforeUpgrade = await page.evaluate(() => JSON.parse(localStorage.getItem('notify-preferences-v1')));
+    assert.equal(beforeUpgrade.mode, 'paused');
+    assert.equal(beforeUpgrade.registration, 'registered');
+    assert.equal(beforeUpgrade.sharing.browser, true);
+    const previousEndpoint = app.store.read().devices.find(d => d.id === firstId).subscription.endpoint;
+    deploymentVersion = 'e2e-deployment-2';
+    let navigations = 0;
+    page.on('framenavigated', frame => { if (frame === page.mainFrame()) navigations++; });
+    await page.reload();
+    try {
+    await until(async () => (await page.evaluate(() => JSON.parse(localStorage.getItem('notify-preferences-v1')))).swVersion === deploymentVersion && (await page.locator('#collection-status').innerText()).includes('Paused remotely'), 'worker upgrade and paused collector restored');
+    } catch (error) { console.log('UPGRADE DEBUG', await page.locator('body').innerText(), await page.evaluate(() => localStorage.getItem('notify-preferences-v1')), errors); throw error; }
+    await until(() => app.store.read().devices.find(d => d.id === firstId).subscription.endpoint !== previousEndpoint, 'replacement subscription synced to backend');
+    await sleep(1000);
+    assert.equal(navigations, 2, 'one requested navigation and exactly one upgrade reload');
+    const upgraded = await page.evaluate(() => JSON.parse(localStorage.getItem('notify-preferences-v1')));
+    assert.equal(upgraded.mode, 'paused');
+    assert.deepEqual(upgraded.sharing, beforeUpgrade.sharing);
+    assert.equal(upgraded.loggingEnabled, true);
+    assert.equal(app.store.read().logs.length, pausedLogs, 'upgrade does not collect while paused');
     const observer = await context.newPage();
     await observer.goto(visitorOrigin + '/notify/');
     await until(async () => (await observer.locator('#collection-status').innerText()).includes('Paused remotely'), 'pause persists in a fresh page');
@@ -190,6 +225,7 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     await page.locator('#share-location').uncheck();
     await page.locator('#enable').click();
     await until(async () => (await page.locator('#status').innerText()).includes("You're subscribed"), 'push re-sync');
+    if (await page.locator('#stop-logging').isEnabled()) await page.locator('#stop-logging').click();
     await page.locator('#permissions input').evaluateAll(inputs => inputs.forEach(i => { i.checked = i.name === 'browser' || i.name === 'network'; }));
     await page.locator('#permissions button[type=submit]').click();
     await until(() => app.store.read().logs.length > 0, 'logging active before unsubscribe');
@@ -223,7 +259,7 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     assert.equal(app.store.read().devices.length, 0);
     if (separate) assert(preflights > 0, 'browser exercised CORS preflights');
     assert.deepEqual(errors, []);
-    console.log(`PASS ${separate ? 'cross-origin' : 'same-origin'}: registration, reload sync, JSON logs, periodic uploads, Stop, admin list/logs, targeted push, worker notification, persistence, pause/resume, scheduler continuity, stale-command rejection, stale-token recovery, unsubscribe, permanent deregistration`);
+    console.log(`PASS ${separate ? 'cross-origin' : 'same-origin'}: registration, reload sync, JSON logs, periodic uploads, Stop, admin list/logs, targeted push, worker notification, persistence, pause/resume, scheduler continuity, stale-command rejection, stale-token recovery, unsubscribe, permanent deregistration, version replacement, localStorage restoration, single upgrade reload`);
   } finally {
     await browser?.close(); await close(frontend); await close(backend); await rm(dir, { recursive: true, force: true });
   }

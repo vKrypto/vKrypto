@@ -87,7 +87,7 @@ export async function createApp({ dataDir = join(here, 'data'), send, allowedOri
           const row = db.devices.find(x => x.id === d.id);
           if (!row) fail(401, 'Device registration required');
           const clientVersion = Number.isSafeInteger(b.controlVersion) && b.controlVersion >= 0 && b.controlVersion < Number.MAX_SAFE_INTEGER ? b.controlVersion : 0;
-          Object.assign(row, { controlVersion: Math.max(row.controlVersion || 0, clientVersion), subscription, geo: geo || null, language: text(b.language, 100), timezone: text(b.timezone, 100), consent: { notifications: true, location: !!geo, policyVersion: text(b.consent.policyVersion, 50), at: new Date().toISOString() }, userAgent: text(req.headers['user-agent']), lastSeen: new Date().toISOString() });
+          Object.assign(row, { controlVersion: Math.max(row.controlVersion || 0, clientVersion), subscription, geo: geo || null, language: b.language === undefined ? row.language : text(b.language, 100), timezone: b.timezone === undefined ? row.timezone : text(b.timezone, 100), consent: { notifications: true, location: !!geo, policyVersion: text(b.consent.policyVersion, 50), at: new Date().toISOString() }, userAgent: text(req.headers['user-agent']), lastSeen: new Date().toISOString() });
         });
         return json(res, 200, { id: d.id });
       }
@@ -173,7 +173,7 @@ export async function createApp({ dataDir = join(here, 'data'), send, allowedOri
       }
       if (req.method === 'GET') {
         const staticFiles = { '/': '../build/notify/index.html', '/notify/': '../build/notify/index.html', '/admin/': 'public/index.html', '/admin/admin.js': 'public/admin.js' };
-        const name = staticFiles[path] || (/^\/notify\/(notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json|config\.json|state\.js)$/.test(path) ? '../build' + path : null);
+        const name = staticFiles[path] || (/^\/notify\/(notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json|config\.json|state\.js|version\.js|version\.json)$/.test(path) ? '../build' + path : null);
         if (name) {
           const content = await readFile(resolve(here, name));
           const type = name.endsWith('.js') ? 'text/javascript' : name.endsWith('.json') ? 'application/json' : 'text/html';

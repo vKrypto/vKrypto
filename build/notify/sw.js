@@ -1,3 +1,4 @@
+const SW_VERSION = "local-3b0eaa3fef6ed362";
 importScripts('./state.js');
 self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
 self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
@@ -55,6 +56,9 @@ async function handlePush(msg) {
     data: { url: msg.url || self.registration.scope, id: msg.id },
   });
 }
+self.addEventListener('message', event => {
+  if (event.data?.type === 'NOTIFY_VERSION') event.ports[0]?.postMessage({ version: SW_VERSION });
+});
 self.addEventListener('push', event => {
   let msg;
   try { msg = event.data?.json() || {}; } catch { msg = { type: 'notification', body: event.data?.text() }; }

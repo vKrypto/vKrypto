@@ -23,6 +23,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Stamp service worker deployment version
+        env:
+          DEPLOY_VERSION: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+        run: python3 scripts/version-notifications.py --version "$DEPLOY_VERSION"
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
@@ -31,7 +35,7 @@ jobs:
       - name: Verify notification page and browser assets
         shell: bash
         run: |
-          for file in index.html notify.js permissions.js client.js sw.js manifest.json config.json state.js; do
+          for file in index.html notify.js permissions.js client.js sw.js manifest.json config.json state.js version.js version.json; do
             test -s "./_site/notify/$file"
             cmp "./build/notify/$file" "./_site/notify/$file"
           done

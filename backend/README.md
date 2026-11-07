@@ -138,7 +138,7 @@ existing `notification` behavior. Only `notification` needs a title.
   snapshots. In-flight uploads are aborted and the backend rejects further ones.
 - `resume`: persists an active state. A running collector resumes on its next
   tick using the visitor's selected fields. A visitor's Stop remains stopped;
-  a fresh page still needs Submit to start a collector.
+  a fresh page restores a previously enabled collector without requesting new permissions.
 - `deregister`: permanently disables the installation, aborts collection,
   deletes device/snapshot/delivery records, clears device credentials, closes
   its notifications, unsubscribes push and unregisters its service worker.
@@ -164,3 +164,38 @@ Scheduling runs only while a visitor page is open, subject to browser throttling
 A service worker cannot reliably run a minute-by-minute timer after the page closes.
 The local scheduler remains active during Pause only if collection had been started;
 Deregister cancels it entirely. No AWS scheduled job has been deployed.
+
+## Deployment versions and saved settings
+
+Each GitHub Pages workflow stamps `notify/sw.js` and `notify/version.json` before
+Jekyll runs. The version contains the commit SHA, workflow run ID and attempt,
+so every deployment (including a rerun of the same commit) gets a new version.
+For local source changes run `python scripts/version-notifications.py`; its
+content hash is stable until notification scripts change.
+
+Common Jekyll layouts and the visitor page load `notify/version.js`. Existing
+installations compare the worker's reported version with the uncached manifest.
+On mismatch the page suspends collection, unsubscribes/unregisters the old worker,
+installs and activates the versioned replacement, renews the push subscription
+without another permission prompt when already allowed, and synchronizes its new
+endpoint to the same backend device. It then reloads once. A deployment/version
+reload marker and a cross-tab Web Lock prevent repeated replacement loops.
+Pending upgrade intent is retained for retry after installation/network failure.
+New visitors and permanently deregistered devices are never silently enrolled.
+
+`localStorage['notify-preferences-v1']` records selected sharing fields,
+subscription-location choice, registration status, active/paused/terminal mode,
+control version, collector-enabled flag and installed worker version. Device
+credentials remain in their backend-scoped localStorage key. Settings are also
+kept in IndexedDB because service workers cannot access localStorage; push state
+changes are mirrored when the page receives them or next opens. Paused state
+survives upgrades and reloads. A previously enabled collector restores itself
+from saved choices; Stop persists a disabled flag. Restoring permissions never
+opens a new hardware permission prompt: ungranted fields report that a manual
+Submit is needed. Deregistration removes sharing/credential details and retains
+only the terminal marker.
+
+Browser integration tests simulate a new deployment while paused. They verify
+uninstall/reinstall, changed push endpoint with the same device identity, exactly
+one automatic reload, unchanged sharing choices, persisted paused mode, no
+paused snapshots, subsequent Resume, and terminal deregistration on reload.
