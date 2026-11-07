@@ -110,7 +110,7 @@ for (const separate of [false, true]) test(`browser integration: ${separate ? 's
     assert.equal(registration.status, 200);
     const admin = await context.newPage();
     await admin.goto(apiOrigin + '/admin/');
-    await admin.locator('#token').fill(app.adminToken);
+    assert.equal(await admin.locator('#token').count(), 0);
     await admin.locator('#load').click();
     await until(async () => await admin.locator('#devices tr').count() === 2, 'admin device list');
     await admin.locator('#devices tr').first().locator('button').click();

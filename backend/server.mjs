@@ -11,17 +11,16 @@ const here = dirname(fileURLToPath(import.meta.url));
 const fields = ['location', 'windows', 'camera', 'microphone', 'network', 'browser', 'battery'];
 const fail = (status, message) => { throw new HttpError(status, message); };
 const text = (v, max = 500) => typeof v === 'string' ? v.slice(0, max) : '';
-export async function createApp({ dataDir = join(here, 'data'), send, adminToken, allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').filter(Boolean), publicOrigin = process.env.PUBLIC_ORIGIN } = {}) {
+export async function createApp({ dataDir = join(here, 'data'), send, allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').filter(Boolean), publicOrigin = process.env.PUBLIC_ORIGIN } = {}) {
   const store = await openStore(dataDir);
   const configPath = join(dataDir, 'config.json');
   let config;
   try { config = JSON.parse(await readFile(configPath, 'utf8')); }
   catch (e) {
     if (e.code !== 'ENOENT') throw e;
-    config = { ...webpush.generateVAPIDKeys(), adminToken: randomBytes(32).toString('hex') };
+    config = webpush.generateVAPIDKeys();
     await writeFile(configPath, JSON.stringify(config, null, 2), { mode: 0o600 });
   }
-  const token = adminToken || config.adminToken;
   const deliver = send || ((subscription, payload) => webpush.sendNotification(subscription, payload, {
     vapidDetails: { subject: process.env.VAPID_SUBJECT || 'mailto:admin@example.com', publicKey: config.publicKey, privateKey: config.privateKey }, timeout: 10000,
   }));
@@ -56,9 +55,6 @@ export async function createApp({ dataDir = join(here, 'data'), send, adminToken
         res.setHeader('Access-Control-Allow-Headers', 'content-type, x-device-token');
       }
       if (req.method === 'OPTIONS' && visitorRoute) { res.writeHead(204); return res.end(); }
-      if (path.startsWith('/api/admin/')) {
-        if (!authorized(req.headers['x-admin-token'], token)) fail(401, 'Admin token required');
-      }
       if (req.method === 'GET' && path === '/api/health') return json(res, 200, { ok: true });
       if (req.method === 'GET' && path === '/api/vapid-public-key') return json(res, 200, { publicKey: config.publicKey });
       if (req.method === 'POST' && path === '/api/session') {
@@ -145,12 +141,12 @@ export async function createApp({ dataDir = join(here, 'data'), send, adminToken
       fail(404, 'Not found');
     } catch (error) { json(res, error.status || 500, { error: error.status ? error.message : 'Internal server error' }); }
   };
-  return { handler, store, adminToken: token };
+  return { handler, store };
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const app = await createApp();
   const port = Number(process.env.PORT || 8980);
   http.createServer(app.handler).listen(port, '127.0.0.1', () => {
-    console.log(`Visitor page: http://localhost:${port}/notify/\nAdmin page: http://localhost:${port}/admin/\nAdmin token is stored in backend/data/config.json (adminToken).`);
+    console.log(`Visitor page: http://localhost:${port}/notify/\nAdmin page: http://localhost:${port}/admin/`);
   });
 }

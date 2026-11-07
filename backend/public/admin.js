@@ -1,6 +1,6 @@
 const $ = id => document.getElementById(id);
 async function api(path, body) {
-  const res = await fetch('/api/admin/' + path, { method: body ? 'POST' : 'GET', headers: { 'x-admin-token': $('token').value, ...(body ? { 'content-type': 'application/json' } : {}) }, body: body ? JSON.stringify(body) : undefined });
+  const res = await fetch('/api/admin/' + path, { method: body ? 'POST' : 'GET', headers: body ? { 'content-type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
   const data = await res.json(); if (!res.ok) throw Error(data.error); return data;
 }
 async function load() {
@@ -31,3 +31,5 @@ $('send').onsubmit = event => {
     } finally { button.disabled = false; }
   });
 };
+
+run(load);

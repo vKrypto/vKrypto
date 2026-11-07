@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Notification admin</title>
 <style>body{font:16px/1.5 system-ui;background:#11151c;color:#e6e9ef;max-width:950px;margin:40px auto;padding:20px}input,textarea,button{font:inherit;padding:10px;border-radius:6px}button{cursor:pointer;background:#5cc3db;border:0;margin:8px}label{display:block;margin:12px 0}table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:10px;border-bottom:1px solid #555}pre{overflow:auto;max-height:400px}input[type=text],textarea{width:90%}</style>
-<h1>Send web push notifications</h1><p>Enter the local admin token from <code>backend/data/config.json</code>. Only devices with push enabled can be selected.</p>
-<label>Admin token <input id="token" type="password" autocomplete="off"></label><button id="load">Load devices</button><p id="status" role="status"></p>
+<h1>Send web push notifications</h1><p>Only devices with push enabled can be selected.</p>
+<button id="load">Load devices</button><p id="status" role="status"></p>
 <table><thead><tr><th>Select</th><th>Device</th><th>Last seen</th><th>Push</th><th>Information</th></tr></thead><tbody id="devices"></tbody></table>
 <form id="send"><label>Title <input id="title" type="text" maxlength="120" required></label><label>Message <textarea id="body" maxlength="1000"></textarea></label><label>Open URL <input id="url" type="text" value="/notify/"></label><button>Send to selected devices</button></form>
 <h2>Logs / delivery results</h2><pre id="output"></pre><script src="/admin/admin.js" type="module"></script></html>

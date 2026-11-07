@@ -11,12 +11,11 @@ npm start
 Visitor page: http://localhost:8980/notify/
 Admin page: http://localhost:8980/admin/
 
-Copy `adminToken` from `backend/data/config.json` into the admin page. The token
-is kept only in the page's memory. Do not share the config file; it also holds
-the VAPID private key. Set `VAPID_SUBJECT=mailto:you@example.com` to your contact
-address before using push beyond local testing. `PORT` defaults to 8980. The
-server binds to loopback only. Use the backend URL rather than the old static
-preview on port 8976.
+The admin page loads devices automatically and requires no admin key. The server
+binds to loopback only. `data/config.json` holds the private VAPID key; do not share
+it. Set `VAPID_SUBJECT=mailto:you@example.com` to your contact address before using
+push beyond local testing. `PORT` defaults to 8980. Use this backend URL rather
+than the old static preview on port 8976.
 
 On the visitor page, enable notifications and accept the browser prompt. That
 registers a push subscription. The separate information form has supported
@@ -43,7 +42,7 @@ backend, not a multi-process database.
 Snapshots are pruned on upload to the newest 10,000 entries and 30 days;
 delivery results are capped at 1,000. Unsubscribe deletes the device and its
 snapshots. Browser device tokens authorize registration/uploads/removal;
-admin routes require `x-admin-token`. Push keys and device tokens are omitted
+admin routes require no key. Push keys and device tokens are omitted
 from device listings. API bodies are capped at 64 KiB. Cross-origin visitor APIs are restricted to explicitly configured origins.
 
 - `GET /api/health`, `GET /api/vapid-public-key`
@@ -53,7 +52,7 @@ from device listings. API bodies are capped at 64 KiB. Cross-origin visitor APIs
 - `GET /api/admin/devices`, `/api/admin/logs?deviceId=…`, `/api/admin/deliveries`
 - `POST /api/admin/send` with `{deviceIds, title, body, url}`
 
-All admin routes need `x-admin-token`. Only selected snapshot fields are saved.
+Only selected snapshot fields are saved.
 `npm test` tests the API with an injected push sender and temporary file storage,
 including persistence, access control, endpoint validation, selected fields,
 targeted delivery, expired subscriptions and unsubscribe deletion. It does not
@@ -79,7 +78,7 @@ On the backend set `ALLOWED_ORIGINS=https://ashutoshverma.com` (comma-separated
 exact origins, without trailing slashes). Use `PUBLIC_ORIGIN=https://notify.example.com`
 when HTTPS terminates at a reverse proxy so origin checks and default links use
 the public address. Keep the listener on loopback and proxy to it. Admin remains
-on the backend origin and requires its token; cross-origin admin access is not
+on the backend origin and requires no key; cross-origin admin access is not
 enabled. Use the frontend's full URL in the notification link field when sending
 from a separate backend. Remote API addresses must use HTTPS; HTTP is accepted
 only for loopback development. A publicly reachable backend has not been deployed.
