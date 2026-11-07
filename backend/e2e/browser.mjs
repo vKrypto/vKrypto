@@ -20,7 +20,7 @@ async function listen(server) {
 }
 async function close(server) { if (server) { server.closeAllConnections(); await new Promise(r => server.close(r)); } }
 
-for (const separate of [false, true]) test(`browser integration: ${separate ? 'separate frontend/API origins' : 'same origin'}`, { timeout: 60000 }, async () => {
+for (const separate of [false, true, 'detect']) test(`browser integration: ${separate ? 'separate frontend/API origins' : 'same origin'}`, { timeout: 60000 }, async () => {
   const dir = await mkdtemp(join(tmpdir(), 'notify-e2e-'));
   let browser, backend, frontend;
   try {
@@ -34,11 +34,15 @@ for (const separate of [false, true]) test(`browser integration: ${separate ? 's
     } });
     let preflights = 0;
     backend = http.createServer((req, res) => { if (req.method === 'OPTIONS') preflights++; app.handler(req, res); });
-    const apiOrigin = await listen(backend);
+    let apiOrigin;
+    if (separate === 'detect') {
+      await new Promise(r => backend.listen(8980, '127.0.0.1', r));
+      apiOrigin = 'http://localhost:8980';
+    } else apiOrigin = await listen(backend);
     visitorOrigin = apiOrigin;
     if (separate) {
       frontend = http.createServer(async (req, res) => {
-        if (req.url === '/notify/config.json') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify({ apiBaseUrl: apiOrigin + '/api' })); }
+        if (req.url === '/notify/config.json') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify({ apiBaseUrl: separate === 'detect' ? '' : apiOrigin + '/api' })); }
         const match = /^\/notify\/(index\.html|notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json)?$/.exec(req.url);
         if (!match) { res.writeHead(404); return res.end(); }
         const file = match[1] || 'index.html';
@@ -46,7 +50,7 @@ for (const separate of [false, true]) test(`browser integration: ${separate ? 's
         res.end(await readFile(resolve(here, '../../build/notify', file)));
       });
       visitorOrigin = await listen(frontend);
-      allowedOrigins.push(visitorOrigin);
+      if (separate !== 'detect') allowedOrigins.push(visitorOrigin);
     }
     browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox'] });
     const context = await browser.newContext({ permissions: ['notifications'] });
@@ -80,6 +84,14 @@ for (const separate of [false, true]) test(`browser integration: ${separate ? 's
     await page.goto(visitorOrigin + '/notify/');
     await until(async () => (await page.locator('#status').innerText()).includes('Backend connected'), 'backend connection indicator');
     assert.equal(await page.locator('#permissions input:not(:disabled):not(:checked)').count(), 0);
+    // Reproduce a static host returning an HTML fallback for POST /api/session.
+    await page.route('**/api/session', route => route.fulfill({ status: 200, contentType: 'text/html', body: '<!DOCTYPE html><h1>Static fallback</h1>' }));
+    await page.locator('#permissions input').evaluateAll(inputs => inputs.forEach(i => { i.checked = i.name === 'browser' || i.name === 'network'; }));
+    await page.locator('#permissions button[type=submit]').click();
+    await until(async () => (await page.locator('#collection-status').innerText()).includes('Backend returned HTML'), 'HTML API response is explained rather than parsed as JSON');
+    assert.equal(app.store.read().devices.length, 0);
+    await page.locator('#stop-logging').click();
+    await page.unroute('**/api/session');
     await page.locator('#share-location').uncheck();
     await page.locator('#enable').click();
     await until(async () => (await page.locator('#status').innerText()).includes("You're subscribed"), 'push registration');

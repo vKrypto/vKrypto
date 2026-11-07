@@ -46,7 +46,15 @@ export async function createApp({ dataDir = join(here, 'data'), send, allowedOri
       const origin = req.headers.origin;
       const sameOrigin = publicOrigin || url.origin;
       const visitorRoute = path.startsWith('/api/') && !path.startsWith('/api/admin/');
-      const allowed = origin && visitorRoute && allowedOrigins.includes(origin);
+      let localPreview = false;
+      try {
+        const source = new URL(origin);
+        const target = new URL(sameOrigin);
+        localPreview = ['localhost', '127.0.0.1', '[::1]'].includes(source.hostname)
+          && ['localhost', '127.0.0.1', '[::1]'].includes(target.hostname)
+          && ['http:', 'https:'].includes(source.protocol);
+      } catch {}
+      const allowed = origin && visitorRoute && (allowedOrigins.includes(origin) || localPreview);
       if (origin && origin !== sameOrigin && !allowed) fail(403, 'Cross-origin request rejected');
       if (allowed) {
         res.setHeader('Access-Control-Allow-Origin', origin);

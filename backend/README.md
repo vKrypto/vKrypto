@@ -62,7 +62,10 @@ send real push messages.
 
 Local frontend and backend work together at `http://localhost:8980/notify/`.
 `build/notify/config.json` contains `{ "apiBaseUrl": "" }`: an empty value uses
-`/api` on the current origin. Device credentials are scoped to the configured
+`/api` on the current origin. Local static/Jekyll previews automatically detect
+the running backend at `http://localhost:8980/api` when their own API is missing.
+Loopback frontend origins can access the loopback backend visitor API; remote
+frontend origins still require `ALLOWED_ORIGINS`. Device credentials are scoped to the configured
 backend. The frontend checks the backend subscription on reload and renews stale
 device credentials after database deletion. Existing same-origin credentials
 are migrated automatically.
@@ -97,7 +100,8 @@ npm run test:e2e
 ```
 
 The browser suite needs local Chrome (`/usr/bin/google-chrome`, or set
-`CHROME_PATH`). It starts isolated servers with temporary databases and tests
+`CHROME_PATH`). Stop the local server before running this suite: the automatic-discovery case
+reserves port 8980. It starts isolated servers with temporary databases and tests
 both same-origin hosting and separate frontend/backend origins, including real
 CORS preflights. It covers notification registration, reload reconciliation,
 JSON console output, repeated uploads (the minute timer is accelerated), Stop,
@@ -109,3 +113,7 @@ remote subscription registration and uses Chrome DevTools to deliver the message
 to the real service worker. Production uses `web-push`; these tests do not verify
 Google/Mozilla/Apple delivery or interactive hardware prompts. All test data is
 removed and browser/server processes are closed when the suite finishes.
+
+HTML API/config responses are rejected with a connection/configuration message,
+including HTTP 200 fallback pages. They are never accepted as successful uploads.
+The browser suite reproduces this failure and verifies retry after routing is restored.
