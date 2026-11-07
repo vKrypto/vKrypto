@@ -17,9 +17,10 @@ it. Set `VAPID_SUBJECT=mailto:you@example.com` to your contact address before us
 push beyond local testing. `PORT` defaults to 8980. Use this backend URL rather
 than the old static preview on port 8976.
 
-On the visitor page, enable notifications and accept the browser prompt. That
-registers a push subscription. The separate information form has supported
-options selected by default; Submit requests permissions and uploads snapshots
+On the visitor page, submit with Push notifications selected (or use Enable notifications) and accept the browser prompt. That
+registers a push subscription. The combined permission form has push notifications and supported
+information options selected by default. Submit requests push permission, registers
+the subscription, and uploads selected snapshots
 immediately and once per minute after the previous collection completes. Stop
 or closing the page ends collection. Browser throttling may delay background
 updates. Camera/microphone are released immediately; no recordings are made.
@@ -117,3 +118,7 @@ removed and browser/server processes are closed when the suite finishes.
 HTML API/config responses are rejected with a connection/configuration message,
 including HTTP 200 fallback pages. They are never accepted as successful uploads.
 The browser suite reproduces this failure and verifies retry after routing is restored.
+
+Devices created by information logging alone are not push-subscribed. Submit with
+Push notifications selected on the visitor device to enable them. A browser that
+already blocks notifications requires changing its site settings before retrying.

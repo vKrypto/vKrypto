@@ -28,14 +28,21 @@ function getLocation() {
   });
 }
 
-async function enable() {
+let enabling;
+export function enableNotifications(options = {}) {
+  if (!enabling) enabling = enable(options).finally(() => { enabling = undefined; });
+  return enabling;
+}
+async function enable({ includeLocation = shareLocation.checked } = {}) {
   enableBtn.disabled = true;
   try {
     setStatus("Asking for permission…");
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
-      setStatus("Notifications are blocked. You can allow them in your browser's site settings.", "error");
-      return;
+      setStatus(permission === 'denied'
+        ? "Notifications are blocked. Allow them in your browser's site settings, then submit again."
+        : 'The notification request was dismissed. Submit again and choose Allow to subscribe.', "error");
+      return false;
     }
 
     const reg = await navigator.serviceWorker.register("./sw.js", { scope: "./" });
@@ -51,7 +58,7 @@ async function enable() {
     }
     subscription ||= await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
 
-    const wantsLocation = shareLocation.checked;
+    const wantsLocation = includeLocation;
     const geo = wantsLocation ? await getLocation() : null;
 
     setStatus("Registering this device…");
@@ -64,9 +71,11 @@ async function enable() {
     });
     setStatus("You're subscribed. You'll get notifications on this device.", "ok");
     render(true);
+    return true;
   } catch (err) {
     console.error(err);
-    setStatus(`Something went wrong: ${err.message}`, "error");
+    setStatus(`Could not enable push notifications: ${err.message}`, "error");
+    return false;
   } finally {
     enableBtn.disabled = false;
   }
@@ -120,6 +129,6 @@ async function init() {
   }
 }
 
-enableBtn.addEventListener("click", enable);
+enableBtn.addEventListener("click", () => enableNotifications());
 disableBtn.addEventListener("click", disable);
 init();

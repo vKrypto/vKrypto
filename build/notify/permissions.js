@@ -1,4 +1,5 @@
 import { api } from "./client.js";
+import { enableNotifications } from "./notify.js";
 // Collection starts only after Submit and stops when this page closes.
 const options = [
   ['location', 'Location (coordinates and accuracy)', () => 'geolocation' in navigator],
@@ -11,7 +12,7 @@ const options = [
 ];
 const root = document.getElementById('permissions');
 const form = document.createElement('form');
-form.innerHTML = `<fieldset><legend>Optional information</legend><p>Choose what to collect. Submit requests the selected permissions and logs a snapshot now and every minute while this page stays open. Selected information is sent to this site’s backend and stored for up to 30 days (maximum 10,000 snapshots across devices). Logs also appear below and in the console. Background tabs may delay updates.</p>${options.map(([id, label, supported]) => `<label><input type="checkbox" name="${id}" ${supported() ? 'checked' : 'disabled'}><span>${label}${supported() ? '' : ' — unavailable in this browser'}</span></label>`).join('')}<label><input type="checkbox" disabled><span>Devices on the same network — automatic discovery is unavailable. Local network access requires a known device address and browser support.</span></label><p>Other permissions (Bluetooth, USB, serial ports, screen sharing, clipboard, MIDI and file access) require a specific action or device picker. They are not requested by this information logger.</p></fieldset><button type="submit">Submit choices and start logging</button><button type="button" id="stop-logging" class="secondary" disabled>Stop logging</button><p id="collection-status" role="status"></p><pre id="collection-log" aria-label="Latest information snapshot"></pre>`;
+form.innerHTML = `<fieldset><legend>Optional information</legend><p>Choose what to collect. Submit also enables push notifications when selected, requests the selected permissions and logs a snapshot now and every minute while this page stays open. Selected information is sent to this site’s backend and stored for up to 30 days (maximum 10,000 snapshots across devices). Logs also appear below and in the console. Background tabs may delay updates.</p><label><input type="checkbox" name="notifications" ${'Notification' in window && 'PushManager' in window && 'serviceWorker' in navigator ? 'checked' : 'disabled'}><span>Push notifications (subscribe this device to receive messages)</span></label>${options.map(([id, label, supported]) => `<label><input type="checkbox" name="${id}" ${supported() ? 'checked' : 'disabled'}><span>${label}${supported() ? '' : ' — unavailable in this browser'}</span></label>`).join('')}<label><input type="checkbox" disabled><span>Devices on the same network — automatic discovery is unavailable. Local network access requires a known device address and browser support.</span></label><p>Other permissions (Bluetooth, USB, serial ports, screen sharing, clipboard, MIDI and file access) require a specific action or device picker. They are not requested by this information logger.</p></fieldset><button type="submit">Submit choices and start logging</button><button type="button" id="stop-logging" class="secondary" disabled>Stop logging</button><p id="collection-status" role="status"></p><pre id="collection-log" aria-label="Latest information snapshot"></pre>`;
 root.append(form);
 const stop = form.querySelector('#stop-logging');
 const status = form.querySelector('#collection-status');
@@ -35,12 +36,15 @@ form.addEventListener('submit', async event => {
   stopLogging();
   const current = session;
   const chosen = options.filter(([id]) => form.elements[id].checked).map(([id]) => id);
-  if (!chosen.length) { status.textContent = 'Choose at least one available option.'; return; }
+  const wantsPush = form.elements.notifications.checked;
+  if (!chosen.length && !wantsPush) { status.textContent = 'Choose at least one available option.'; return; }
   uploadController = new AbortController();
   const signal = uploadController.signal;
   form.querySelector('button[type=submit]').disabled = true;
   stop.disabled = false;
   status.textContent = 'Requesting selected permissions…';
+  // Request push permission immediately inside the Submit gesture.
+  const push = wantsPush ? enableNotifications({ includeLocation: false }) : Promise.resolve(null);
   const resources = {};
   const errors = {};
   // Start activation-dependent requests directly from the submit gesture.
@@ -56,8 +60,14 @@ form.addEventListener('submit', async event => {
       if (id === 'battery') resources.battery = await navigator.getBattery();
     } catch (error) { errors[id] = error.name; }
   });
-  await Promise.all(requests);
+  const [, pushEnabled] = await Promise.all([Promise.all(requests), push]);
   if (session !== current) return;
+  if (wantsPush && !pushEnabled) errors.notifications = 'Push was not enabled. See the notification status above.';
+  if (!chosen.length) {
+    stopLogging();
+    status.textContent = pushEnabled ? 'Push notifications enabled. No information logging selected.' : errors.notifications;
+    return;
+  }
   async function snapshot() {
     const data = { timestamp: new Date().toISOString(), selected: chosen, errors: { ...errors } };
     for (const id of chosen) {

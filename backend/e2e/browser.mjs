@@ -93,7 +93,8 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     await page.locator('#stop-logging').click();
     await page.unroute('**/api/session');
     await page.locator('#share-location').uncheck();
-    await page.locator('#enable').click();
+    await page.locator('#permissions input').evaluateAll(inputs => inputs.forEach(i => { i.checked = ['notifications', 'browser', 'network'].includes(i.name); }));
+    await page.locator('#permissions button[type=submit]').click();
     await until(async () => (await page.locator('#status').innerText()).includes("You're subscribed"), 'push registration');
     assert.equal(app.store.read().devices.length, 1);
     assert(app.store.read().devices[0].subscription);
