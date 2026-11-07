@@ -44,6 +44,15 @@ test('file persistence, device ownership, selected snapshots, targeted delivery 
     const reopened = await createApp({ dataDir: dir });
     assert.equal(reopened.store.read().logs.length, 1);
     assert.equal(reopened.store.read().devices.length, 2);
+    assert.equal((await call('POST', '/api/admin/send', { deviceIds: [a.id], type: 'invalid' })).status, 400);
+    await call('POST', '/api/admin/send', { deviceIds: [a.id], type: 'pause' });
+    assert.equal(app.store.read().devices[0].mode, 'paused');
+    assert.equal(JSON.parse(sent.at(-1).payload).version, 1);
+    assert.equal((await call('POST', '/api/snapshots', { selected: ['browser'], policyVersion: '2026-11-07' }, auth)).status, 409);
+    await call('POST', '/api/admin/send', { deviceIds: [a.id], type: 'resume' });
+    assert.equal(app.store.read().devices[0].mode, 'active');
+    assert.equal(JSON.parse(sent.at(-1).payload).version, 2);
+    assert.equal((await call('POST', '/api/snapshots', { selected: ['browser'], policyVersion: '2026-11-07' }, auth)).status, 201);
     expired = true;
     await call('POST', '/api/admin/send', { deviceIds: [a.id], title: 'Expired' }, admin);
     assert.equal(app.store.read().devices.find(d => d.id === a.id).subscription, null);
@@ -51,5 +60,16 @@ test('file persistence, device ownership, selected snapshots, targeted delivery 
     await call('POST', '/api/devices/unsubscribe', {}, auth);
     assert.equal(app.store.read().logs.length, 0);
     assert.equal(app.store.read().devices.length, 1);
+    expired = false;
+    const authB = { 'x-device-token': b.token };
+    await call('POST', '/api/devices', { subscription, consent: { notifications: true } }, authB);
+    await call('POST', '/api/snapshots', { selected: ['browser'], policyVersion: '2026-11-07' }, authB);
+    const deregister = await call('POST', '/api/admin/send', { deviceIds: [b.id], type: 'deregister' });
+    assert.equal(deregister.data.results[0].ok, true);
+    assert.equal((await call('POST', '/api/snapshots', { selected: ['browser'], policyVersion: '2026-11-07' }, authB)).status, 410);
+    assert.equal(app.store.read().devices.length, 0);
+    assert.equal(app.store.read().logs.length, 0);
+    assert.equal(app.store.read().deliveries.length, 0);
+
   } finally { await rm(dir, { recursive: true, force: true }); }
 });

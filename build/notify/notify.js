@@ -1,4 +1,4 @@
-import { api, deviceStatus } from "./client.js";
+import { api, deviceStatus, controlState } from "./client.js";
 const POLICY_VERSION = "2026-11-07";
 
 const $ = (id) => document.getElementById(id);
@@ -6,6 +6,7 @@ const statusEl = $("status");
 const enableBtn = $("enable");
 const disableBtn = $("disable");
 const shareLocation = $("share-location");
+enableBtn.disabled = true;
 
 const setStatus = (text, kind = "") => {
   statusEl.textContent = text;
@@ -29,6 +30,8 @@ function getLocation() {
 }
 
 let enabling;
+let deregistered = false;
+let paused = false;
 export function enableNotifications(options = {}) {
   if (!enabling) enabling = enable(options).finally(() => { enabling = undefined; });
   return enabling;
@@ -36,6 +39,8 @@ export function enableNotifications(options = {}) {
 async function enable({ includeLocation = shareLocation.checked } = {}) {
   enableBtn.disabled = true;
   try {
+    if (deregistered) throw Error('This device has been permanently deregistered.');
+    if (paused) throw Error('Collection is paused. Wait for a Resume command before requesting permissions.');
     setStatus("Asking for permission…");
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
@@ -45,6 +50,7 @@ async function enable({ includeLocation = shareLocation.checked } = {}) {
       return false;
     }
 
+    if ((await controlState()).mode === 'deregistered') throw Error('This device has been permanently deregistered.');
     const reg = await navigator.serviceWorker.register("./sw.js", { scope: "./" });
     await navigator.serviceWorker.ready;
 
@@ -58,12 +64,18 @@ async function enable({ includeLocation = shareLocation.checked } = {}) {
     }
     subscription ||= await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
 
-    const wantsLocation = includeLocation;
+    if ((await controlState()).mode === 'deregistered') {
+      await subscription.unsubscribe();
+      await reg.unregister();
+      throw Error('This device has been permanently deregistered.');
+    }
+    const wantsLocation = includeLocation && (await controlState()).mode === 'active';
     const geo = wantsLocation ? await getLocation() : null;
 
     setStatus("Registering this device…");
     await api("/devices", {
       subscription: subscription.toJSON(),
+      controlVersion: (await controlState()).version,
       geo,
       language: navigator.language,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -77,7 +89,7 @@ async function enable({ includeLocation = shareLocation.checked } = {}) {
     setStatus(`Could not enable push notifications: ${err.message}`, "error");
     return false;
   } finally {
-    enableBtn.disabled = false;
+    enableBtn.disabled = deregistered || paused;
   }
 }
 
@@ -105,7 +117,22 @@ function render(subscribed) {
   disableBtn.hidden = !subscribed;
 }
 
+function showDeregistered() {
+  deregistered = true;
+  enableBtn.disabled = true;
+  disableBtn.hidden = true;
+  setStatus('This device has been permanently deregistered. Collection and push are disabled.');
+}
+window.addEventListener('notify-control', event => {
+  if (event.detail.mode === 'deregistered') showDeregistered();
+  paused = event.detail.mode === 'paused';
+  if (!deregistered) enableBtn.disabled = paused;
+});
 async function init() {
+  const state = await controlState();
+  if (state.mode === 'deregistered') { showDeregistered(); return; }
+  paused = state.mode === 'paused';
+  enableBtn.disabled = paused;
   if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
     setStatus(
       "This browser doesn't support web notifications. On iPhone/iPad, add this site to your Home Screen first, then open it from there.",
@@ -117,6 +144,7 @@ async function init() {
   try {
     await api('/health');
     const reg = await navigator.serviceWorker.getRegistration('./');
+    if (reg) await reg.update().catch(() => {});
     const sub = await reg?.pushManager.getSubscription();
     const device = await deviceStatus();
     const subscribed = Boolean(sub) && Notification.permission === 'granted' && device?.pushEnabled && device.endpoint === sub.endpoint;

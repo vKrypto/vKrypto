@@ -1,3 +1,4 @@
+import "./state.js";
 let config;
 let pending;
 const timeout = 15000;
@@ -74,21 +75,28 @@ async function clearIdentity() {
   const { key } = await settings();
   try { localStorage.removeItem(key); } catch {}
   pending = undefined;
+  await NotifyState.update(({ credential, ...state }) => state);
+}
+async function remember(identity, base) {
+  const state = await NotifyState.update(state => state.mode === 'deregistered' ? state : { ...state, credential: { ...identity, base } });
+  if (state.mode === 'deregistered') throw Error('This device has been permanently deregistered.');
+  return identity;
 }
 async function session() {
   const { base, key } = await settings();
   const saved = savedIdentity(key);
-  if (saved) return saved;
+  if (saved) return remember(saved, base);
   if (!pending) pending = (async () => {
     const response = await request(base + '/session', { method: 'POST' });
     const data = await readJson(response);
     if (!response.ok) throw Error(data.error || 'Device registration failed.');
     try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
-    return data;
+    return remember(data, base);
   })().catch(error => { pending = undefined; throw error; });
   return pending;
 }
 export async function api(path, body, options = {}, retry = true) {
+  if ((await NotifyState.read()).mode === 'deregistered') throw Error('This device has been permanently deregistered.');
   options.signal?.throwIfAborted();
   const { base } = await settings();
   const privateRequest = Boolean(body) || path === '/device';
@@ -101,6 +109,10 @@ export async function api(path, body, options = {}, retry = true) {
     body: body ? JSON.stringify(body) : undefined,
   });
   const data = await readJson(response);
+  if (response.status === 410 && privateRequest) {
+    await NotifyState.update(state => ({ mode: 'deregistered', version: state.version }));
+    await publishControl();
+  }
   if (response.status === 401 && privateRequest) {
     await clearIdentity();
     // A deleted/reset database must not permanently strand a browser's saved token.
@@ -115,8 +127,34 @@ export async function api(path, body, options = {}, retry = true) {
   return data;
 }
 export async function deviceStatus() {
+  if ((await NotifyState.read()).mode === 'deregistered') return null;
   const { key } = await settings();
   if (!savedIdentity(key) && !pending) return null;
   try { return await api('/device'); }
   catch (error) { if (error.status === 401) return null; throw error; }
 }
+
+export async function controlState() { return NotifyState.read(); }
+async function publishControl() {
+  const state = await controlState();
+  if (state.mode === 'deregistered') {
+    try {
+      for (const key of Object.keys(localStorage)) if (key === 'notify-user-id' || key.startsWith('notify-device-session')) localStorage.removeItem(key);
+    } catch {}
+    pending = undefined;
+  }
+  window.dispatchEvent(new CustomEvent('notify-control', { detail: state }));
+  if (state.mode === 'deregistered' && 'serviceWorker' in navigator) {
+    const reg = await navigator.serviceWorker.getRegistration(new URL('./', import.meta.url));
+    if (reg) {
+      try { await (await reg.pushManager.getSubscription())?.unsubscribe(); } catch {}
+      try { (await reg.getNotifications()).forEach(notification => notification.close()); } catch {}
+      await reg.unregister();
+    }
+  }
+}
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', event => {
+  if (event.data?.type === 'notify-control') publishControl().catch(console.error);
+});
+
+controlState().then(state => { if (state.mode === 'deregistered') return publishControl(); }).catch(console.error);

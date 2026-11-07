@@ -43,7 +43,7 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     if (separate) {
       frontend = http.createServer(async (req, res) => {
         if (req.url === '/notify/config.json') { res.setHeader('content-type', 'application/json'); return res.end(JSON.stringify({ apiBaseUrl: separate === 'detect' ? '' : apiOrigin + '/api' })); }
-        const match = /^\/notify\/(index\.html|notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json)?$/.exec(req.url);
+        const match = /^\/notify\/(index\.html|notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json|state\.js)?$/.exec(req.url);
         if (!match) { res.writeHead(404); return res.end(); }
         const file = match[1] || 'index.html';
         res.setHeader('content-type', file.endsWith('.js') ? 'text/javascript' : file.endsWith('.json') ? 'application/json' : 'text/html');
@@ -56,7 +56,7 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     const context = await browser.newContext({ permissions: ['notifications'] });
     await context.addInitScript(() => {
       const originalTimeout = window.setTimeout;
-      window.setTimeout = (fn, ms, ...args) => originalTimeout(fn, ms === 60000 ? 200 : ms, ...args);
+      window.setTimeout = (fn, ms, ...args) => ms === 60000 ? originalTimeout(() => { window.schedulerTicks = (window.schedulerTicks || 0) + 1; fn(...args); }, 200) : originalTimeout(fn, ms, ...args);
       // Chrome's remote push registration is replaced with an external-provider
       // fixture. No production code uses this fixture.
       const subscription = () => {
@@ -145,9 +145,41 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     const persisted = await createApp({ dataDir: dir });
     assert.equal(persisted.store.read().logs.length, count);
     assert.equal(persisted.store.read().deliveries.length, 1);
+    // Control commands travel through the same admin API and real worker.
+    await page.locator('#permissions button[type=submit]').click();
+    await until(() => app.store.read().logs.length > count, 'logger restarted for pause test');
+    async function command(type, id = firstId) {
+      await admin.locator('#message-type').selectOption(type);
+      await admin.locator(`#devices input[value="${id}"]`).check();
+      const previous = sent.length;
+      await admin.locator('#send button').click();
+      await until(() => sent.length > previous, `${type} push sent`);
+      await until(async () => (await admin.locator('#status').innerText()).includes('1 accepted') && !await admin.locator('#send button').isDisabled(), `${type} push accepted`);
+    }
+    await command('pause');
+    await until(async () => (await page.evaluate(() => NotifyState.read())).mode === 'paused', 'worker persisted pause');
+    await until(() => app.store.read().devices[0].mode === 'paused', 'backend persisted pause');
+    await sleep(300);
+    const pausedLogs = app.store.read().logs.length, pausedConsole = consoleSnapshots.length;
+    const ticks = await page.evaluate(() => window.schedulerTicks || 0);
+    await sleep(1200);
+    assert.equal(app.store.read().logs.length, pausedLogs);
+    assert.equal(consoleSnapshots.length, pausedConsole, 'no console snapshots while paused');
+    assert((await page.evaluate(() => window.schedulerTicks)) > ticks, 'scheduler still ticks while paused');
+    const observer = await context.newPage();
+    await observer.goto(visitorOrigin + '/notify/');
+    await until(async () => (await observer.locator('#collection-status').innerText()).includes('Paused remotely'), 'pause persists in a fresh page');
+    await observer.close();
+    await command('resume');
+    await until(() => app.store.read().logs.length > pausedLogs, 'resume continues uploads');
+    const resumedState = await page.evaluate(() => NotifyState.read());
+    await pushClient.send('ServiceWorker.deliverPushMessage', { origin: visitorOrigin, registrationId, data: JSON.stringify({ type: 'pause', version: resumedState.version - 1 }) });
+    await sleep(300);
+    assert.equal((await page.evaluate(() => NotifyState.read())).mode, 'active', 'stale control push ignored');
+    await page.locator('#stop-logging').click();
     // A database reset invalidates the token: the client renews it on upload,
     // then offers to re-sync push rather than showing a false subscribed state.
-    await app.store.update(db => { db.devices = []; db.logs = []; });
+    await app.store.update(db => { db.devices = []; db.logs = []; db.deliveries = []; });
     await page.locator('#permissions button[type=submit]').click();
     await until(() => app.store.read().logs.length > 0, 'stale device-token recovery');
     assert.equal(app.store.read().devices.length, 1);
@@ -165,9 +197,33 @@ for (const separate of [false, true, 'detect']) test(`browser integration: ${sep
     await until(async () => (await page.locator('#status').innerText()).includes('Unsubscribed'), 'unsubscribe');
     await sleep(1200);
     assert.equal(app.store.read().devices.length, 0); assert.equal(app.store.read().logs.length, 0);
+    // Deregistration is terminal: delete records, stop scheduler, remove worker,
+    // forget credentials, and remain inactive after the next page load.
+    await page.locator('#permissions input').evaluateAll(inputs => inputs.forEach(i => { i.checked = ['notifications', 'browser'].includes(i.name); }));
+    await page.locator('#permissions button[type=submit]').click();
+    await until(() => app.store.read().devices.some(d => d.subscription) && app.store.read().logs.length > 0, 'new subscription before deregister');
+    const finalId = app.store.read().devices[0].id;
+    await admin.locator('#load').click();
+    await until(async () => await admin.locator(`#devices input[value="${finalId}"]`).count() === 1, 'final device loaded');
+    await command('deregister', finalId);
+    await until(async () => (await page.locator('#collection-status').innerText()).includes('Permanently deregistered'), 'open page stops after deregister');
+    await until(() => app.store.read().devices.length === 0, 'backend device deleted');
+    assert.equal(app.store.read().logs.length, 0);
+    assert.equal(app.store.read().deliveries.length, 0);
+    await until(async () => await page.evaluate(async () => !(await navigator.serviceWorker.getRegistration('./'))), 'worker unregistered');
+    assert.equal((await page.evaluate(() => NotifyState.read())).credential, undefined);
+    assert.equal(await page.evaluate(() => Object.keys(localStorage).some(key => key.startsWith('notify-device-session'))), false);
+    let apiCalls = 0;
+    page.on('request', request => { if (request.url().includes('/api/')) apiCalls++; });
+    await page.reload();
+    await until(async () => (await page.locator('#collection-status').innerText()).includes('Permanently deregistered'), 'terminal state survives reload');
+    await sleep(1000);
+    assert.equal(apiCalls, 0, 'no API requests after deregister/reload');
+    assert.equal(await page.locator('#enable').isDisabled(), true);
+    assert.equal(app.store.read().devices.length, 0);
     if (separate) assert(preflights > 0, 'browser exercised CORS preflights');
     assert.deepEqual(errors, []);
-    console.log(`PASS ${separate ? 'cross-origin' : 'same-origin'}: registration, reload sync, JSON logs, periodic uploads, Stop, admin list/logs, targeted push, worker notification, persistence, stale-token recovery, unsubscribe`);
+    console.log(`PASS ${separate ? 'cross-origin' : 'same-origin'}: registration, reload sync, JSON logs, periodic uploads, Stop, admin list/logs, targeted push, worker notification, persistence, pause/resume, scheduler continuity, stale-command rejection, stale-token recovery, unsubscribe, permanent deregistration`);
   } finally {
     await browser?.close(); await close(frontend); await close(backend); await rm(dir, { recursive: true, force: true });
   }

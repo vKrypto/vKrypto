@@ -122,3 +122,45 @@ The browser suite reproduces this failure and verifies retry after routing is re
 Devices created by information logging alone are not push-subscribed. Submit with
 Push notifications selected on the visitor device to enable them. A browser that
 already blocks notifications requires changing its site settings before retrying.
+
+## Push message types
+
+`POST /api/admin/send` accepts `type`, `deviceIds`, and optional display fields.
+The admin page provides a message-type selector. Omitting `type` keeps the
+existing `notification` behavior. Only `notification` needs a title.
+
+```json
+{ "type": "pause", "deviceIds": ["device-id"] }
+```
+
+- `pause`: persists a paused state in IndexedDB and on the backend. The current
+  page scheduler continues to tick but does not collect, console-log or upload
+  snapshots. In-flight uploads are aborted and the backend rejects further ones.
+- `resume`: persists an active state. A running collector resumes on its next
+  tick using the visitor's selected fields. A visitor's Stop remains stopped;
+  a fresh page still needs Submit to start a collector.
+- `deregister`: permanently disables the installation, aborts collection,
+  deletes device/snapshot/delivery records, clears device credentials, closes
+  its notifications, unsubscribes push and unregisters its service worker.
+  A minimal terminal marker remains in IndexedDB to prevent automatic restart
+  or re-registration after reload. The backend retains an opaque SHA-256 token
+  fingerprint (no device metadata) so an undelivered command cannot trigger
+  automatic re-registration via an old token; those tokens receive HTTP 410.
+  Clearing browser site data removes the browser
+  marker. Website code cannot erase downloaded scripts from the browser or
+  revoke browser site permissions; it makes them inactive instead.
+- `notification`: displays the supplied title/body/link, including while
+  collection is paused.
+
+The backend assigns increasing control versions. The worker ignores duplicate
+or older commands, and no later command can reactivate a deregistered installation.
+Pause/resume show visible confirmation notifications; browser Web Push requires
+user-visible effects and must not be treated as a silent background channel.
+Push-provider acceptance is not proof of device execution. Offline devices apply
+commands when delivery occurs. Deregistration deletes backend records upon provider
+acceptance; the browser-side cleanup completes when its worker receives the command.
+
+Scheduling runs only while a visitor page is open, subject to browser throttling.
+A service worker cannot reliably run a minute-by-minute timer after the page closes.
+The local scheduler remains active during Pause only if collection had been started;
+Deregister cancels it entirely. No AWS scheduled job has been deployed.

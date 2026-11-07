@@ -2,7 +2,7 @@ import http from 'node:http';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
-import { randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
+import { randomBytes, randomUUID, timingSafeEqual, createHash } from 'node:crypto';
 import webpush from 'web-push';
 import { openStore } from './store.mjs';
 import { validateSubscription, validateGeo, HttpError } from '../notification-service/src/validate.mjs';
@@ -33,7 +33,10 @@ export async function createApp({ dataDir = join(here, 'data'), send, allowedOri
     try { const b = JSON.parse(raw); if (!b || typeof b !== 'object' || Array.isArray(b)) throw Error(); return b; }
     catch { fail(400, 'Expected a JSON object'); }
   }
+  const tokenHash = token => createHash('sha256').update(token).digest('hex');
   function device(req) {
+    const given = req.headers['x-device-token'];
+    if (typeof given === 'string' && store.read().revoked?.includes(tokenHash(given))) fail(410, 'This device has been permanently deregistered');
     const found = store.read().devices.find(d => authorized(req.headers['x-device-token'], d.token));
     if (!found) fail(401, 'Device registration required');
     return found;
@@ -72,7 +75,7 @@ export async function createApp({ dataDir = join(here, 'data'), send, allowedOri
       }
       if (req.method === 'GET' && path === '/api/device') {
         const d = device(req);
-        return json(res, 200, { id: d.id, pushEnabled: !!d.subscription, endpoint: d.subscription?.endpoint || null });
+        return json(res, 200, { id: d.id, pushEnabled: !!d.subscription, mode: d.mode || 'active', endpoint: d.subscription?.endpoint || null });
       }
       if (req.method === 'POST' && path === '/api/devices') {
         const d = device(req), b = await body(req);
@@ -81,27 +84,34 @@ export async function createApp({ dataDir = join(here, 'data'), send, allowedOri
         if (b.consent?.notifications !== true) fail(400, 'Notification consent required');
         await store.update(db => {
           if (db.devices.some(x => x.id !== d.id && x.subscription?.endpoint === subscription.endpoint)) fail(409, 'Subscription already registered');
-          Object.assign(db.devices.find(x => x.id === d.id), { subscription, geo: geo || null, language: text(b.language, 100), timezone: text(b.timezone, 100), consent: { notifications: true, location: !!geo, policyVersion: text(b.consent.policyVersion, 50), at: new Date().toISOString() }, userAgent: text(req.headers['user-agent']), lastSeen: new Date().toISOString() });
+          const row = db.devices.find(x => x.id === d.id);
+          if (!row) fail(401, 'Device registration required');
+          const clientVersion = Number.isSafeInteger(b.controlVersion) && b.controlVersion >= 0 && b.controlVersion < Number.MAX_SAFE_INTEGER ? b.controlVersion : 0;
+          Object.assign(row, { controlVersion: Math.max(row.controlVersion || 0, clientVersion), subscription, geo: geo || null, language: text(b.language, 100), timezone: text(b.timezone, 100), consent: { notifications: true, location: !!geo, policyVersion: text(b.consent.policyVersion, 50), at: new Date().toISOString() }, userAgent: text(req.headers['user-agent']), lastSeen: new Date().toISOString() });
         });
         return json(res, 200, { id: d.id });
       }
       if (req.method === 'POST' && path === '/api/devices/unsubscribe') {
         const d = device(req);
-        await store.update(db => { db.devices = db.devices.filter(x => x.id !== d.id); db.logs = db.logs.filter(x => x.deviceId !== d.id); });
+        await store.update(db => { db.devices = db.devices.filter(x => x.id !== d.id); db.logs = db.logs.filter(x => x.deviceId !== d.id); db.deliveries = db.deliveries.filter(x => x.deviceId !== d.id); });
         return json(res, 200, { ok: true });
       }
       if (req.method === 'POST' && path === '/api/snapshots') {
         const d = device(req), b = await body(req);
+        if (d.mode === 'paused') fail(409, 'Collection is paused for this device');
         if (!Array.isArray(b.selected) || !b.selected.length || b.selected.some(x => !fields.includes(x))) fail(400, 'Invalid selected capabilities');
         if (b.policyVersion !== '2026-11-07') fail(400, 'Consent policy required');
         const snapshot = { selected: [...new Set(b.selected)], errors: b.errors && typeof b.errors === 'object' ? b.errors : {} };
         for (const key of snapshot.selected) if (b[key] !== undefined) snapshot[key] = b[key];
         await store.update(db => {
+          const row = db.devices.find(x => x.id === d.id);
+          if (!row) fail(401, 'Device registration required');
+          if (row.mode === 'paused') fail(409, 'Collection is paused for this device');
           const now = new Date().toISOString();
           db.logs.push({ id: randomUUID(), deviceId: d.id, receivedAt: now, policyVersion: b.policyVersion, snapshot });
           const cutoff = Date.now() - 30 * 86400000;
           db.logs = db.logs.filter(x => Date.parse(x.receivedAt) >= cutoff).slice(-10000);
-          const row = db.devices.find(x => x.id === d.id); row.lastSeen = now; row.selected = snapshot.selected;
+          row.lastSeen = now; row.selected = snapshot.selected;
         });
         return json(res, 201, { ok: true });
       }
@@ -115,7 +125,9 @@ export async function createApp({ dataDir = join(here, 'data'), send, allowedOri
       if (req.method === 'POST' && path === '/api/admin/send') {
         const b = await body(req);
         if (!Array.isArray(b.deviceIds) || !b.deviceIds.length || b.deviceIds.length > 100 || b.deviceIds.some(id => typeof id !== 'string')) fail(400, 'Select 1–100 devices');
-        if (!text(b.title, 120).trim()) fail(400, 'Title required');
+        const type = b.type || 'notification';
+        if (!['pause', 'resume', 'deregister', 'notification'].includes(type)) fail(400, 'Invalid push message type');
+        if (type === 'notification' && !text(b.title, 120).trim()) fail(400, 'Title required');
         let target;
         try { target = new URL(b.url || '/notify/', publicOrigin || url.origin); }
         catch { fail(400, 'Invalid notification URL'); }
@@ -123,23 +135,45 @@ export async function createApp({ dataDir = join(here, 'data'), send, allowedOri
         const devices = store.read().devices;
         const chosen = [...new Set(b.deviceIds)].map(id => devices.find(d => d.id === id));
         if (chosen.some(d => !d?.subscription)) fail(400, 'Every selected device must have an active push subscription');
-        const payload = JSON.stringify({ title: text(b.title, 120), body: text(b.body, 1000), url: target.href });
+        const message = { type, title: text(b.title, 120), body: text(b.body, 1000), url: target.href };
         const results = [];
         for (const d of chosen) {
-          let result = { deviceId: d.id, sentAt: new Date().toISOString(), ok: true };
-          try { await deliver(d.subscription, payload); }
+          let result = { deviceId: d.id, type, sentAt: new Date().toISOString(), ok: true };
+          try {
+            let version;
+            if (type !== 'notification') version = await store.update(db => {
+              const row = db.devices.find(x => x.id === d.id);
+              if (!row) fail(404, 'Device removed');
+              row.controlVersion = (row.controlVersion || 0) + 1;
+              return row.controlVersion;
+            });
+            await deliver(d.subscription, JSON.stringify({ ...message, ...(version ? { version } : {}) }));
+            await store.update(db => {
+              if (type === 'deregister') {
+                db.revoked ||= [];
+                const hash = tokenHash(d.token);
+                if (!db.revoked.includes(hash)) db.revoked.push(hash);
+                db.devices = db.devices.filter(x => x.id !== d.id);
+                db.logs = db.logs.filter(x => x.deviceId !== d.id);
+                db.deliveries = db.deliveries.filter(x => x.deviceId !== d.id);
+              } else if (type === 'pause' || type === 'resume') {
+                const row = db.devices.find(x => x.id === d.id);
+                if (row && row.controlVersion === version) row.mode = type === 'pause' ? 'paused' : 'active';
+              }
+            });
+          }
           catch (error) {
             result.ok = false; result.status = error.statusCode || 0; result.error = 'Push delivery failed';
             if ([404, 410].includes(error.statusCode)) await store.update(db => { const row = db.devices.find(x => x.id === d.id); if (row) row.subscription = null; });
           }
           results.push(result);
         }
-        await store.update(db => { db.deliveries.push(...results); db.deliveries = db.deliveries.slice(-1000); });
+        await store.update(db => { db.deliveries.push(...results.filter(result => type !== 'deregister' && db.devices.some(d => d.id === result.deviceId))); db.deliveries = db.deliveries.slice(-1000); });
         return json(res, 200, { results });
       }
       if (req.method === 'GET') {
         const staticFiles = { '/': '../build/notify/index.html', '/notify/': '../build/notify/index.html', '/admin/': 'public/index.html', '/admin/admin.js': 'public/admin.js' };
-        const name = staticFiles[path] || (/^\/notify\/(notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json|config\.json)$/.test(path) ? '../build' + path : null);
+        const name = staticFiles[path] || (/^\/notify\/(notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json|config\.json|state\.js)$/.test(path) ? '../build' + path : null);
         if (name) {
           const content = await readFile(resolve(here, name));
           const type = name.endsWith('.js') ? 'text/javascript' : name.endsWith('.json') ? 'application/json' : 'text/html';

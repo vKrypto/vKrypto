@@ -1,4 +1,4 @@
-import { api } from "./client.js";
+import { api, controlState } from "./client.js";
 import { enableNotifications } from "./notify.js";
 // Collection starts only after Submit and stops when this page closes.
 const options = [
@@ -20,12 +20,44 @@ const output = form.querySelector('#collection-log');
 let session = 0;
 let timer;
 let uploadController;
+let remoteMode = 'active';
+let controlVersion = 0;
+let captureEpoch = 0;
+let running = false;
+const submit = form.querySelector('button[type=submit]');
+function applyControl(state) {
+  if (state.mode !== remoteMode || state.version !== controlVersion) captureEpoch++;
+  remoteMode = state.mode;
+  controlVersion = state.version;
+  if (state.mode === 'paused') {
+    uploadController?.abort();
+    submit.disabled = true;
+    status.textContent = 'Paused remotely. The scheduler continues without collecting, logging or uploading.';
+  } else if (state.mode === 'deregistered') {
+    stopLogging();
+    form.querySelector('fieldset').disabled = true;
+    submit.disabled = true;
+    output.textContent = '';
+    status.textContent = 'Permanently deregistered. Collection, logging and uploads are disabled.';
+  } else {
+    submit.disabled = running;
+    if (running) status.textContent = 'Resumed. Collection continues on the next scheduled tick.';
+  }
+}
+window.addEventListener('notify-control', event => applyControl(event.detail));
+form.querySelector('fieldset').disabled = true;
+submit.disabled = true;
+controlState().then(state => {
+  if (state.mode !== 'deregistered') form.querySelector('fieldset').disabled = false;
+  applyControl(state);
+}).catch(() => { status.textContent = 'Could not read collection control state. Collection is disabled.'; });
 function stopLogging() {
   session++;
+  running = false;
   clearTimeout(timer);
   uploadController?.abort();
   stop.disabled = true;
-  form.querySelector('button[type=submit]').disabled = false;
+  submit.disabled = remoteMode !== 'active';
   status.textContent = 'Logging stopped. Browser grants can be revoked in site settings.';
 }
 stop.addEventListener('click', stopLogging);
@@ -33,13 +65,13 @@ window.addEventListener('pagehide', stopLogging);
 window.addEventListener('notify-unsubscribed', stopLogging);
 form.addEventListener('submit', async event => {
   event.preventDefault();
+  if (remoteMode !== 'active') return;
   stopLogging();
   const current = session;
   const chosen = options.filter(([id]) => form.elements[id].checked).map(([id]) => id);
   const wantsPush = form.elements.notifications.checked;
   if (!chosen.length && !wantsPush) { status.textContent = 'Choose at least one available option.'; return; }
-  uploadController = new AbortController();
-  const signal = uploadController.signal;
+  running = true;
   form.querySelector('button[type=submit]').disabled = true;
   stop.disabled = false;
   status.textContent = 'Requesting selected permissions…';
@@ -69,6 +101,11 @@ form.addEventListener('submit', async event => {
     return;
   }
   async function snapshot() {
+    const epoch = captureEpoch;
+    const active = async () => current === session && remoteMode === 'active' && epoch === captureEpoch && (await controlState()).mode === 'active';
+    if (!await active()) return;
+    uploadController = new AbortController();
+    const signal = uploadController.signal;
     const data = { timestamp: new Date().toISOString(), selected: chosen, errors: { ...errors } };
     for (const id of chosen) {
       if (errors[id]) continue;
@@ -84,20 +121,31 @@ form.addEventListener('submit', async event => {
         if (id === 'browser') data.browser = { userAgent: navigator.userAgent, language: navigator.language, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, screen: { width: screen.width, height: screen.height } };
         if (id === 'battery') data.battery = { level: resources.battery.level, charging: resources.battery.charging };
       } catch (error) { data.errors[id] = error.message || error.name || 'Unavailable or denied'; }
-      if (session !== current) return;
+      if (!await active()) return;
     }
-    if (session !== current) return;
+    if (!await active()) return;
     output.textContent = JSON.stringify(data, null, 2);
     console.info(JSON.stringify(data, null, 2));
     try {
       await api('/snapshots', { ...data, policyVersion: '2026-11-07' }, { signal });
-      if (session !== current) return;
+      if (!await active()) return;
       status.textContent = 'Logging active. Snapshot saved to backend. Next snapshot in one minute.';
     } catch (error) {
-      if (session !== current) return;
+      if (!await active()) return;
       status.textContent = `Snapshot upload failed: ${error.message}. Retrying next minute.`;
     }
-    timer = setTimeout(snapshot, 60000);
   }
-  await snapshot();
+  async function tick() {
+    if (session !== current) return;
+    try {
+      const state = await controlState();
+      if (state.mode !== remoteMode || state.version !== controlVersion) applyControl(state);
+      if (state.mode === 'active') await snapshot();
+    } catch (error) {
+      if (session === current) status.textContent = `Collection suspended: ${error.message}`;
+    } finally {
+      if (session === current) timer = setTimeout(tick, 60000);
+    }
+  }
+  await tick();
 });
