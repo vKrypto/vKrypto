@@ -18,9 +18,11 @@ const status = form.querySelector('#collection-status');
 const output = form.querySelector('#collection-log');
 let session = 0;
 let timer;
+let uploadController;
 function stopLogging() {
   session++;
   clearTimeout(timer);
+  uploadController?.abort();
   stop.disabled = true;
   form.querySelector('button[type=submit]').disabled = false;
   status.textContent = 'Logging stopped. Browser grants can be revoked in site settings.';
@@ -34,6 +36,8 @@ form.addEventListener('submit', async event => {
   const current = session;
   const chosen = options.filter(([id]) => form.elements[id].checked).map(([id]) => id);
   if (!chosen.length) { status.textContent = 'Choose at least one available option.'; return; }
+  uploadController = new AbortController();
+  const signal = uploadController.signal;
   form.querySelector('button[type=submit]').disabled = true;
   stop.disabled = false;
   status.textContent = 'Requesting selected permissions…';
@@ -76,7 +80,7 @@ form.addEventListener('submit', async event => {
     output.textContent = JSON.stringify(data, null, 2);
     console.info(JSON.stringify(data, null, 2));
     try {
-      await api('/snapshots', { ...data, policyVersion: '2026-11-07' });
+      await api('/snapshots', { ...data, policyVersion: '2026-11-07' }, { signal });
       if (session !== current) return;
       status.textContent = 'Logging active. Snapshot saved to backend. Next snapshot in one minute.';
     } catch (error) {

@@ -11,7 +11,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const fields = ['location', 'windows', 'camera', 'microphone', 'network', 'browser', 'battery'];
 const fail = (status, message) => { throw new HttpError(status, message); };
 const text = (v, max = 500) => typeof v === 'string' ? v.slice(0, max) : '';
-export async function createApp({ dataDir = join(here, 'data'), send, adminToken } = {}) {
+export async function createApp({ dataDir = join(here, 'data'), send, adminToken, allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').filter(Boolean), publicOrigin = process.env.PUBLIC_ORIGIN } = {}) {
   const store = await openStore(dataDir);
   const configPath = join(dataDir, 'config.json');
   let config;
@@ -44,8 +44,18 @@ export async function createApp({ dataDir = join(here, 'data'), send, adminToken
     try {
       const url = new URL(req.url, 'http://' + req.headers.host);
       const path = url.pathname;
-      // No cross-origin API access; reject browser writes from other origins.
-      if (req.method === 'POST' && req.headers.origin && req.headers.origin !== url.origin) fail(403, 'Cross-origin request rejected');
+      const origin = req.headers.origin;
+      const sameOrigin = publicOrigin || url.origin;
+      const visitorRoute = path.startsWith('/api/') && !path.startsWith('/api/admin/');
+      const allowed = origin && visitorRoute && allowedOrigins.includes(origin);
+      if (origin && origin !== sameOrigin && !allowed) fail(403, 'Cross-origin request rejected');
+      if (allowed) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Vary', 'Origin');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'content-type, x-device-token');
+      }
+      if (req.method === 'OPTIONS' && visitorRoute) { res.writeHead(204); return res.end(); }
       if (path.startsWith('/api/admin/')) {
         if (!authorized(req.headers['x-admin-token'], token)) fail(401, 'Admin token required');
       }
@@ -55,6 +65,10 @@ export async function createApp({ dataDir = join(here, 'data'), send, adminToken
         const d = { id: randomUUID(), token: randomBytes(32).toString('hex'), createdAt: new Date().toISOString(), lastSeen: new Date().toISOString(), subscription: null };
         await store.update(db => { db.devices.push(d); });
         return json(res, 201, { id: d.id, token: d.token });
+      }
+      if (req.method === 'GET' && path === '/api/device') {
+        const d = device(req);
+        return json(res, 200, { id: d.id, pushEnabled: !!d.subscription, endpoint: d.subscription?.endpoint || null });
       }
       if (req.method === 'POST' && path === '/api/devices') {
         const d = device(req), b = await body(req);
@@ -98,7 +112,9 @@ export async function createApp({ dataDir = join(here, 'data'), send, adminToken
         const b = await body(req);
         if (!Array.isArray(b.deviceIds) || !b.deviceIds.length || b.deviceIds.length > 100 || b.deviceIds.some(id => typeof id !== 'string')) fail(400, 'Select 1–100 devices');
         if (!text(b.title, 120).trim()) fail(400, 'Title required');
-        const target = new URL(b.url || '/notify/', url.origin);
+        let target;
+        try { target = new URL(b.url || '/notify/', publicOrigin || url.origin); }
+        catch { fail(400, 'Invalid notification URL'); }
         if (!['https:', 'http:'].includes(target.protocol)) fail(400, 'Invalid notification URL');
         const devices = store.read().devices;
         const chosen = [...new Set(b.deviceIds)].map(id => devices.find(d => d.id === id));
@@ -119,7 +135,7 @@ export async function createApp({ dataDir = join(here, 'data'), send, adminToken
       }
       if (req.method === 'GET') {
         const staticFiles = { '/': '../build/notify/index.html', '/notify/': '../build/notify/index.html', '/admin/': 'public/index.html', '/admin/admin.js': 'public/admin.js' };
-        const name = staticFiles[path] || (/^\/notify\/(notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json)$/.test(path) ? '../build' + path : null);
+        const name = staticFiles[path] || (/^\/notify\/(notify\.js|permissions\.js|client\.js|sw\.js|manifest\.json|config\.json)$/.test(path) ? '../build' + path : null);
         if (name) {
           const content = await readFile(resolve(here, name));
           const type = name.endsWith('.js') ? 'text/javascript' : name.endsWith('.json') ? 'application/json' : 'text/html';

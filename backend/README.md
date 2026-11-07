@@ -44,10 +44,11 @@ Snapshots are pruned on upload to the newest 10,000 entries and 30 days;
 delivery results are capped at 1,000. Unsubscribe deletes the device and its
 snapshots. Browser device tokens authorize registration/uploads/removal;
 admin routes require `x-admin-token`. Push keys and device tokens are omitted
-from device listings. API bodies are capped at 64 KiB. No CORS is enabled.
+from device listings. API bodies are capped at 64 KiB. Cross-origin visitor APIs are restricted to explicitly configured origins.
 
 - `GET /api/health`, `GET /api/vapid-public-key`
 - `POST /api/session` → device ID and token
+- `GET /api/device` with `x-device-token` reports current subscription state
 - `POST /api/devices`, `/api/snapshots`, `/api/devices/unsubscribe` with `x-device-token`
 - `GET /api/admin/devices`, `/api/admin/logs?deviceId=…`, `/api/admin/deliveries`
 - `POST /api/admin/send` with `{deviceIds, title, body, url}`
@@ -58,17 +59,54 @@ including persistence, access control, endpoint validation, selected fields,
 targeted delivery, expired subscriptions and unsubscribe deletion. It does not
 send real push messages.
 
-## Jekyll / GitHub Pages
+## Frontend configuration and GitHub Pages
 
-The existing Pages workflow builds `build/` with Jekyll into `_site/`. The
-notification page and its JavaScript have no front matter and are copied as
-static assets. A post-build check verifies every notification asset before
-uploading `_site`. Backend code and private data live outside the Jekyll source.
+Local frontend and backend work together at `http://localhost:8980/notify/`.
+`build/notify/config.json` contains `{ "apiBaseUrl": "" }`: an empty value uses
+`/api` on the current origin. Device credentials are scoped to the configured
+backend. The frontend checks the backend subscription on reload and renews stale
+device credentials after database deletion. Existing same-origin credentials
+are migrated automatically.
 
-Console snapshots are pretty-printed JSON strings (`JSON.stringify`), so the
-message text can be copied directly into a JSON parser.
+For a GitHub Pages frontend and separately hosted backend, set the public API
+base in that file before building, for example:
 
-GitHub Pages hosts only the static frontend. The Node backend must run separately;
-the current `/api` URLs assume the backend serves the page or an API reverse proxy
-is available on the same origin. GitHub Pages alone cannot accept snapshot uploads
-or send push notifications. Local development continues at port 8980.
+```json
+{ "apiBaseUrl": "https://notify.example.com/api" }
+```
+
+On the backend set `ALLOWED_ORIGINS=https://ashutoshverma.com` (comma-separated
+exact origins, without trailing slashes). Use `PUBLIC_ORIGIN=https://notify.example.com`
+when HTTPS terminates at a reverse proxy so origin checks and default links use
+the public address. Keep the listener on loopback and proxy to it. Admin remains
+on the backend origin and requires its token; cross-origin admin access is not
+enabled. Use the frontend's full URL in the notification link field when sending
+from a separate backend. Remote API addresses must use HTTPS; HTTP is accepted
+only for loopback development. A publicly reachable backend has not been deployed.
+
+The Pages workflow builds `build/` with Jekyll into `_site/`. Notification HTML,
+configuration and browser scripts are copied as static assets, then verified
+before uploading. Backend code and private data remain outside the Jekyll source.
+GitHub Pages hosts only the static frontend; it does not run Node.js.
+Console snapshots are formatted JSON strings that can be copied into a parser.
+
+## Browser end-to-end tests
+
+```sh
+npm test
+npm run test:e2e
+```
+
+The browser suite needs local Chrome (`/usr/bin/google-chrome`, or set
+`CHROME_PATH`). It starts isolated servers with temporary databases and tests
+both same-origin hosting and separate frontend/backend origins, including real
+CORS preflights. It covers notification registration, reload reconciliation,
+JSON console output, repeated uploads (the minute timer is accelerated), Stop,
+admin selection/logs/send, actual service-worker notification display, persistence,
+legacy credential migration, stale-token recovery, re-sync and unsubscribe cleanup.
+
+Only the external push provider is simulated: the fixture replaces Chrome's
+remote subscription registration and uses Chrome DevTools to deliver the message
+to the real service worker. Production uses `web-push`; these tests do not verify
+Google/Mozilla/Apple delivery or interactive hardware prompts. All test data is
+removed and browser/server processes are closed when the suite finishes.

@@ -11,20 +11,24 @@ test('file persistence, device ownership, selected snapshots, targeted delivery 
   try {
     const sent = [];
     let expired = false;
-    const app = await createApp({ dataDir: dir, adminToken: 'test-admin', send: async (sub, payload) => { sent.push({ sub, payload }); if (expired) throw { statusCode: 410 }; } });
+    const app = await createApp({ dataDir: dir, adminToken: 'test-admin', allowedOrigins: ['https://example.github.io'], send: async (sub, payload) => { sent.push({ sub, payload }); if (expired) throw { statusCode: 410 }; } });
     async function call(method, path, body, headers = {}) {
       const req = Readable.from(body ? [JSON.stringify(body)] : []);
       Object.assign(req, { method, url: path, headers: { host: 'localhost:8980', ...headers } });
       let status, result;
-      await app.handler(req, { writeHead(code) { status = code; }, end(raw) { result = JSON.parse(raw); } });
+      await app.handler(req, { setHeader() {}, writeHead(code) { status = code; }, end(raw) { result = raw ? JSON.parse(raw) : null; } });
       return { status, data: result };
     }
     assert.equal((await call('GET', '/api/admin/devices')).status, 401);
     assert.equal((await call('POST', '/api/session', null, { origin: 'http://evil.example' })).status, 403);
-    const a = (await call('POST', '/api/session')).data;
+    assert.equal((await call('OPTIONS', '/api/snapshots', null, { origin: 'https://example.github.io' })).status, 204);
+    assert.equal((await call('GET', '/api/admin/devices', null, { origin: 'https://example.github.io', 'x-admin-token': 'test-admin' })).status, 403);
+    const a = (await call('POST', '/api/session', null, { origin: 'https://example.github.io' })).data;
     const b = (await call('POST', '/api/session')).data;
     const auth = { 'x-device-token': a.token };
     const admin = { 'x-admin-token': 'test-admin' };
+    assert.equal((await call('GET', '/api/device', null, auth)).data.id, a.id);
+    assert.equal((await call('GET', '/api/device')).status, 401);
     const subscription = { endpoint: 'https://fcm.googleapis.com/fcm/send/test', keys: { p256dh: 'fake', auth: 'fake' } };
     assert.equal((await call('POST', '/api/devices', { subscription, consent: { notifications: true } }, auth)).status, 200);
     assert.equal((await call('POST', '/api/devices', { subscription: { ...subscription, endpoint: 'https://127.0.0.1/push' }, consent: { notifications: true } }, auth)).status, 400);

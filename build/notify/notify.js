@@ -1,4 +1,4 @@
-import { api } from "./client.js";
+import { api, deviceStatus } from "./client.js";
 const POLICY_VERSION = "2026-11-07";
 
 const $ = (id) => document.getElementById(id);
@@ -42,9 +42,14 @@ async function enable() {
     await navigator.serviceWorker.ready;
 
     const { publicKey } = await api("/vapid-public-key");
-    const subscription =
-      (await reg.pushManager.getSubscription()) ||
-      (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(publicKey) }));
+    const key = urlBase64ToUint8Array(publicKey);
+    let subscription = await reg.pushManager.getSubscription();
+    const oldKey = subscription?.options?.applicationServerKey;
+    if (oldKey && String(new Uint8Array(oldKey)) !== String(key)) {
+      await subscription.unsubscribe();
+      subscription = null;
+    }
+    subscription ||= await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
 
     const wantsLocation = shareLocation.checked;
     const geo = wantsLocation ? await getLocation() : null;
@@ -72,11 +77,10 @@ async function disable() {
   try {
     const reg = await navigator.serviceWorker.getRegistration("./");
     const sub = await reg?.pushManager.getSubscription();
-    if (sub) {
-      await api("/devices/unsubscribe", { endpoint: sub.endpoint });
-      await sub.unsubscribe();
-    }
     window.dispatchEvent(new Event("notify-unsubscribed"));
+    try { await api("/devices/unsubscribe", {}); }
+    catch (error) { if (error.status !== 401) throw error; }
+    if (sub) await sub.unsubscribe();
     setStatus("Unsubscribed. This device won't get notifications.");
     render(false);
   } catch (err) {
@@ -101,11 +105,19 @@ async function init() {
     enableBtn.disabled = true;
     return;
   }
-  const reg = await navigator.serviceWorker.getRegistration("./");
-  const sub = await reg?.pushManager.getSubscription();
-  const subscribed = Boolean(sub) && Notification.permission === "granted";
-  render(subscribed);
-  if (subscribed) setStatus("You're subscribed on this device.", "ok");
+  try {
+    await api('/health');
+    const reg = await navigator.serviceWorker.getRegistration('./');
+    const sub = await reg?.pushManager.getSubscription();
+    const device = await deviceStatus();
+    const subscribed = Boolean(sub) && Notification.permission === 'granted' && device?.pushEnabled && device.endpoint === sub.endpoint;
+    render(subscribed);
+    if (subscribed) setStatus("You're subscribed and synced with the backend.", 'ok');
+    else setStatus('Backend connected. Enable notifications to sync this device.', 'ok');
+  } catch (error) {
+    render(false);
+    setStatus(error.message, 'error');
+  }
 }
 
 enableBtn.addEventListener("click", enable);
