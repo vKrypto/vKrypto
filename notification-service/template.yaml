@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Low-cost notification service: browser Web Push + signed outbound webhooks.
+  One Lambda (Function URL, no API Gateway) + one on-demand DynamoDB table.
+
+Parameters:
+  AllowedOrigin:
+    Type: String
+    Default: https://ashutoshverma.com
+    Description: Origin of the GitHub Pages site allowed to call the API (CORS).
+  VapidPublicKey:
+    Type: String
+    Description: VAPID public key (npm run vapid).
+  VapidPrivateKey:
+    Type: String
+    NoEcho: true
+    Description: VAPID private key (npm run vapid).
+  VapidSubject:
+    Type: String
+    Default: "mailto:ashutosh.career19@gmail.com"
+    Description: "Contact the push services can reach you at (mailto or https URL)."
+  AdminApiKey:
+    Type: String
+    NoEcho: true
+    MinLength: 24
+    Description: "Secret for admin routes (send events, manage webhooks). Generate with openssl rand -hex 32"
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Architectures: [arm64]   # cheaper than x86 per GB-second
+    MemorySize: 256
+    Timeout: 30
+
+Resources:
+  NotifyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: pk, AttributeType: S }
+        - { AttributeName: sk, AttributeType: S }
+      KeySchema:
+        - { AttributeName: pk, KeyType: HASH }
+        - { AttributeName: sk, KeyType: RANGE }
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  NotifyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/index.handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref NotifyTable
+          VAPID_PUBLIC_KEY: !Ref VapidPublicKey
+          VAPID_PRIVATE_KEY: !Ref VapidPrivateKey
+          VAPID_SUBJECT: !Ref VapidSubject
+          ADMIN_API_KEY: !Ref AdminApiKey
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref NotifyTable
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowOrigins: [!Ref AllowedOrigin]
+          AllowMethods: [GET, POST, DELETE]
+          AllowHeaders: [content-type, x-api-key]
+          MaxAge: 86400
+
+  NotifyFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${NotifyFunction}
+      RetentionInDays: 7
+
+Outputs:
+  ApiUrl:
+    Description: Paste this into build/notify/notify.js (API_URL)
+    Value: !GetAtt NotifyFunctionUrl.FunctionUrl
+  TableName:
+    Value: !Ref NotifyTable

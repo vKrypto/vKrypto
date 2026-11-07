@@ -1,0 +1,10 @@
+{
+  "name": "Ashutosh Verma",
+  "short_name": "Ashutosh",
+  "start_url": "/notify/",
+  "scope": "/notify/",
+  "display": "standalone",
+  "background_color": "#f7f8fa",
+  "theme_color": "#42A8C0",
+  "icons": [{ "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }]
+}

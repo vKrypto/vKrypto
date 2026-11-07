@@ -1,0 +1,20 @@
+{
+  "name": "notification-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Low-cost Web Push + webhook notification service (AWS Lambda + DynamoDB)",
+  "scripts": {
+    "vapid": "web-push generate-vapid-keys",
+    "test": "node --test test/",
+    "build": "sam build",
+    "deploy": "sam build && sam deploy --guided"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/lib-dynamodb": "^3.600.0"
+  }
+}
