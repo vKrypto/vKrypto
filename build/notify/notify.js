@@ -54,6 +54,7 @@ async function api(path, body) {
 async function enable() {
   enableBtn.disabled = true;
   try {
+    if (API_URL.includes("REPLACE-ME")) throw new Error("Notification backend is not configured. Optional information logging below works locally.");
     setStatus("Asking for permission…");
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {

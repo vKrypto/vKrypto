@@ -13,7 +13,7 @@
     * { box-sizing: border-box; }
     body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px;
            font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); }
-    main { width: 100%; max-width: 440px; background: var(--card); border-radius: 14px; padding: 28px;
+    main { width: 100%; max-width: 640px; background: var(--card); border-radius: 14px; padding: 28px;
            box-shadow: 0 2px 16px rgba(0,0,0,.08); }
     h1 { margin: 0 0 8px; font-size: 1.4rem; }
     p { margin: 0 0 20px; color: var(--muted); }
@@ -26,6 +26,9 @@
     #status { margin: 16px 0 0; min-height: 1.5em; font-size: .95rem; }
     #status[data-kind="ok"] { color: var(--ok); }
     #status[data-kind="error"] { color: var(--err); }
+    fieldset { border: 1px solid var(--muted); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    pre { overflow: auto; max-height: 320px; font-size: .8rem; }
+    #stop-logging { margin-top: 10px; }
     small { display: block; margin-top: 20px; color: var(--muted); font-size: .8rem; }
   </style>
 </head>
@@ -35,8 +38,8 @@
     <p>Get a browser notification when I publish something new. You can turn it off any time.</p>
 
     <label>
-      <input type="checkbox" id="share-location">
-      <span>Also share my approximate location (optional, used only to tailor notifications)</span>
+      <input type="checkbox" id="share-location" checked>
+      <span>Also share my location with the notification service (optional; includes precise coordinates)</span>
     </label>
 
     <button id="enable">Enable notifications</button>
@@ -45,7 +48,10 @@
 
     <small>When you subscribe, this site stores your browser's push address, IP address, browser type, language and
       time zone (plus location if you tick the box) to send notifications. Unsubscribing removes your device.</small>
+    <hr>
+    <section id="permissions" aria-label="Optional permission choices"></section>
   </main>
+  <script src="./permissions.js" type="module"></script>
   <script src="./notify.js" type="module"></script>
 </body>
 </html>
